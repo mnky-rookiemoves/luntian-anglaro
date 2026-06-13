@@ -13,8 +13,9 @@ const NAV_ITEMS = [
 ];
 
 const AppLayout = () => {
-  const { language, toggleLanguage, health } = useGameStore();
+  const { language, toggleLanguage, health, currentPlayer } = useGameStore();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  
 
   return (
     <div className="min-h-screen flex bg-[var(--luntian-bg)]">
@@ -61,6 +62,43 @@ const AppLayout = () => {
             </NavLink>
           ))}
         </nav>
+        {/* Player Section */}
+        <div className="px-3 py-2 border-t border-[var(--luntian-primary)]/20">
+          {currentPlayer ? (
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                  isActive
+                    ? 'bg-[var(--luntian-primary)]/20 text-[var(--luntian-primary-light)] font-semibold'
+                    : 'text-[var(--luntian-text-muted)] hover:bg-[var(--luntian-primary)]/10 hover:text-[var(--luntian-text)]'
+                }`
+              }
+            >
+              <span className="text-lg">👤</span>
+              {!sidebarCollapsed && (
+                <div className="truncate">
+                  <div className="text-sm font-medium truncate">{currentPlayer.display_name}</div>
+                  <div className="text-[10px] text-[var(--luntian-text-muted)]">Lv.{currentPlayer.level} • {currentPlayer.luntian_form_display}</div>
+                </div>
+              )}
+            </NavLink>
+          ) : (
+            <NavLink
+              to="/create-player"
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-200 ${
+                  isActive
+                    ? 'bg-[var(--luntian-gold)]/20 text-[var(--luntian-gold)] font-semibold'
+                    : 'text-[var(--luntian-gold)] hover:bg-[var(--luntian-gold)]/10'
+                }`
+              }
+            >
+              <span className="text-lg">✨</span>
+              {!sidebarCollapsed && <span>{language === 'en' ? 'Create Player' : 'Gumawa ng Player'}</span>}
+            </NavLink>
+          )}
+        </div>
 
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-[var(--luntian-primary)]/20 space-y-2">

@@ -8,6 +8,8 @@ import RegionsPage from '@/pages/RegionsPage';
 import AchievementsPage from '@/pages/AchievementsPage';
 import LeaderboardPage from '@/pages/LeaderboardPage';
 import CodexPage from '@/pages/CodexPage';
+import CreatePlayerPage from '@/pages/CreatePlayerPage';
+import ProfilePage from '@/pages/ProfilePage';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/codex" element={<CodexPage />} />
+          <Route path="/create-player" element={<CreatePlayerPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Routes>
       <Toaster
