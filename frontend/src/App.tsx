@@ -10,6 +10,7 @@ import LeaderboardPage from '@/pages/LeaderboardPage';
 import CodexPage from '@/pages/CodexPage';
 import CreatePlayerPage from '@/pages/CreatePlayerPage';
 import ProfilePage from '@/pages/ProfilePage';
+import MapPage from '@/pages/MapPage';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/codex" element={<CodexPage />} />
           <Route path="/create-player" element={<CreatePlayerPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/map" element={<MapPage />} />
         </Route>
       </Routes>
       <Toaster

@@ -4,9 +4,10 @@ import { useGameStore } from '@/store';
 
 const NAV_ITEMS = [
   { path: '/', icon: '🏠', label: 'Home', labelFil: 'Tahanan' },
+  { path: '/map', icon: '🗺️', label: 'World Map', labelFil: 'Mapa ng Mundo' },
   { path: '/guardians', icon: '🛡️', label: 'Guardians', labelFil: 'Mga Tagapag-alaga' },
   { path: '/generals', icon: '💀', label: 'Generals', labelFil: 'Mga Heneral' },
-  { path: '/regions', icon: '🗺️', label: 'Regions', labelFil: 'Mga Rehiyon' },
+  { path: '/regions', icon: '📍', label: 'Regions', labelFil: 'Mga Rehiyon' },
   { path: '/achievements', icon: '🏆', label: 'Achievements', labelFil: 'Mga Tagumpay' },
   { path: '/leaderboard', icon: '📊', label: 'Leaderboard', labelFil: 'Ranggo' },
   { path: '/codex', icon: '📚', label: 'Codex', labelFil: 'Eskwelahan' },
