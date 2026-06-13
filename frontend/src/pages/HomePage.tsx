@@ -20,7 +20,6 @@ const HomePage = () => {
     regions,
     achievements,
     language,
-    toggleLanguage,
   } = useGameStore();
 
   // Initialize game data on mount
@@ -57,14 +56,7 @@ const HomePage = () => {
         ))}
       </div>
 
-      {/* Language Toggle */}
-      <button
-        onClick={toggleLanguage}
-        className="absolute top-4 right-4 z-20 px-3 py-1 text-sm rounded-full border border-[var(--luntian-primary)] text-[var(--luntian-text-muted)] hover:bg-[var(--luntian-primary)]/20 transition-all"
-      >
-        {language === 'en' ? '🇵🇭 Filipino' : '🇺🇸 English'}
-      </button>
-
+      
       {/* Hero Section */}
       <div className="relative z-10 text-center px-6 pt-20">
         <div
