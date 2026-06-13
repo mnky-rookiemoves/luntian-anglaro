@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ============================================
+   LUNTIAN ANGLARO — Design System
+   "Luntiang Puso, Luntiang Gawa"
+   ============================================ */
+
+/* Custom CSS Variables — LUNTIAN Earth Palette */
+:root {
+  --luntian-primary: #2E7D32;
+  --luntian-primary-light: #4CAF50;
+  --luntian-primary-dark: #1B5E20;
+  --luntian-secondary: #1565C0;
+  --luntian-accent: #FF8F00;
+  --luntian-danger: #C62828;
+  --luntian-earth: #5D4037;
+  --luntian-sky: #0288D1;
+  --luntian-gold: #FFD600;
+  --luntian-bg: #0a0f0a;
+  --luntian-surface: #1a2e1a;
+  --luntian-text: #e8f5e9;
+  --luntian-text-muted: #a5d6a7;
+}
+
+/* Base dark theme */
+body {
+  @apply bg-[var(--luntian-bg)] text-[var(--luntian-text)] font-sans antialiased;
+  margin: 0;
+  min-height: 100vh;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--luntian-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--luntian-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--luntian-primary-light);
+}
