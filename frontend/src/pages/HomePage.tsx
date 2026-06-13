@@ -58,7 +58,7 @@ const HomePage = () => {
 
       
       {/* Hero Section */}
-      <div className="relative z-10 text-center px-6 pt-20">
+      <div className="relative z-10 text-center px-6 pt-10">
         <div
           className="text-7xl mb-6 inline-block"
           style={{
@@ -220,10 +220,6 @@ const HomePage = () => {
           </div>
         )}
 
-        {/* Version badge */}
-        <div className="mt-8 mb-6 text-xs text-[var(--luntian-text-muted)]/50">
-          v0.1.0 — Phase 0 • Built with 💚 by Sensei & Master
-        </div>
       </div>
     </div>
   );
