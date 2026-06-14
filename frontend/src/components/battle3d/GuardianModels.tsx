@@ -13,6 +13,7 @@ import { useRef, useMemo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import type { AnimPhase } from '@/hooks/useBattleLogic'
+import { hasGLBModel, GLBModel } from './GLBModelLoader'
 
 interface ModelProps {
   animPhase: AnimPhase
@@ -1439,8 +1440,14 @@ export function AngDumiModel({ animPhase, hp, role, baseX }: ModelProps) {
 }
 /* ═══════════════════════════════════════════════
    LOOKUP — Maps guardian/general name → model
+   Checks for .glb first, falls back to procedural
    ═══════════════════════════════════════════════ */
+import { hasGLBModel, GLBModel } from './GLBModelLoader'
+
 export function GuardianModelLookup({ name, ...props }: ModelProps & { name: string }) {
+  if (hasGLBModel(name)) {
+    return <GLBModel name={name} {...props} />
+  }
   switch (name) {
     case 'luntian':  return <LuntianModel {...props} />
     case 'alon':     return <AlonModel {...props} />
@@ -1451,12 +1458,10 @@ export function GuardianModelLookup({ name, ...props }: ModelProps & { name: str
   }
 }
 
-  // ... keep what's already there
-
-/* ═══════════════════════════════════════════════
-   LOOKUP — Maps general name → model
-   ═══════════════════════════════════════════════ */
 export function GeneralModelLookup({ name, ...props }: ModelProps & { name: string }) {
+  if (hasGLBModel(name)) {
+    return <GLBModel name={name} {...props} />
+  }
   switch (name) {
     case 'usok':     return <UsokModel {...props} />
     case 'mantsa':   return <MantsaModel {...props} />
