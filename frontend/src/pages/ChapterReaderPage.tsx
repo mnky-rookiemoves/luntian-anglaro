@@ -102,6 +102,16 @@ export default function ChapterReaderPage() {
 
   const [sceneIdx, setSceneIdx] = useState(0)
   const [dialogIdx, setDialogIdx] = useState(0)
+  // Reset all state when chapter changes
+  useEffect(() => {
+    setSceneIdx(0)
+    setDialogIdx(0)
+    setDisplayedText('')
+    setIsTyping(false)
+    setShowBattle(false)
+    setShowComplete(false)
+    voice.stop()
+  }, [chapterId])
   const [displayedText, setDisplayedText] = useState('')
   const [isTyping, setIsTyping] = useState(false)
   const [showBattle, setShowBattle] = useState(false)
