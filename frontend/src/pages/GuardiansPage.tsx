@@ -23,16 +23,6 @@ const GuardiansPage = () => {
     if (!isInitialized) initialize()
   }, [initialize, isInitialized])
 
-  // Guard: wait for data to load
-  if (!generals || !Array.isArray(generals) || generals.length === 0) {
-    return (
-      <div className="p-6 text-center">
-        <div className="text-4xl mb-4 animate-pulse">🌿</div>
-        <p className="text-[var(--luntian-text-muted)]">Loading Generals...</p>
-      </div>
-    )
-  }
-
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-[var(--luntian-primary-light)] mb-2">
