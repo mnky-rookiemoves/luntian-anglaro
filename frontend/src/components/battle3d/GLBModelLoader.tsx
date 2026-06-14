@@ -122,18 +122,18 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
     if (!group.current) return
     const t = state.clock.elapsedTime
 
-    // ── Idle Bob (up and down) ──
+    // ── Idle Bob ──
     group.current.position.y = config.yOffset + centerOffset.y + Math.sin(t * 1.5) * 0.12
 
-    // ── Idle Breathing (scale pulse) ──
+    // ── Idle Breathing ──
     const breathScale = 1.0 + Math.sin(t * 2) * 0.03
     group.current.scale.set(breathScale, breathScale, breathScale)
 
-    // ── Idle Sway (gentle lean) ──
+    // ── Idle Sway ──
     group.current.rotation.z = Math.sin(t * 0.8) * 0.03
     group.current.rotation.x = Math.cos(t * 0.6) * 0.02
 
-    // ── Lunge toward enemy when attacking ──
+    // ── Lunge ──
     const isAttacking =
       (role === 'guardian' && animPhase === 'player_attacking') ||
       (role === 'general' && animPhase === 'enemy_attacking')
@@ -155,16 +155,69 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
     prevPhase.current = animPhase
     flashRef.current = Math.max(0, flashRef.current - delta * 4)
 
-    // ── Apply emissive pulse + flash + death ──
+    // ── Animate mesh children based on position (limb simulation) ──
     group.current.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
+        const mesh = child as THREE.Mesh
+        const mat = mesh.material as THREE.MeshStandardMaterial
+
+        // Inject vertex animation via onBeforeCompile (runs once)
+        if (!mat.userData.animated) {
+          mat.userData.animated = true
+          mat.onBeforeCompile = (shader) => {
+            shader.uniforms.uTime = { value: 0 }
+            mat.userData.shader = shader
+
+            // Inject time uniform declaration
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <common>',
+              `#include <common>
+              uniform float uTime;`
+            )
+
+            // Inject vertex displacement before project_vertex
+            shader.vertexShader = shader.vertexShader.replace(
+              '#include <begin_vertex>',
+              `#include <begin_vertex>
+              
+              // Height-based animation (0 = feet, 1 = head)
+              float heightFactor = clamp(position.y * 0.5 + 0.5, 0.0, 1.0);
+              
+              // Upper body sway (arms, head move more)
+              float upperSway = heightFactor * heightFactor;
+              transformed.x += sin(uTime * 1.8 + position.y * 2.0) * upperSway * 0.04;
+              transformed.z += cos(uTime * 1.3 + position.y * 1.5) * upperSway * 0.03;
+              
+              // Walking motion (alternating leg movement)
+              float legFactor = 1.0 - heightFactor;
+              float legMotion = sin(uTime * 3.0 + position.x * 8.0) * legFactor * legFactor * 0.03;
+              transformed.y += legMotion;
+              transformed.z += sin(uTime * 3.0 + position.x * 6.0) * legFactor * 0.02;
+              
+              // Torso twist
+              float twist = sin(uTime * 1.5) * heightFactor * 0.02;
+              float cosT = cos(twist);
+              float sinT = sin(twist);
+              vec3 twisted = transformed;
+              twisted.x = transformed.x * cosT - transformed.z * sinT;
+              twisted.z = transformed.x * sinT + transformed.z * cosT;
+              transformed = twisted;
+              `
+            )
+          }
+          mat.needsUpdate = true
+        }
+
+        // Update time uniform each frame
+        if (mat.userData.shader) {
+          mat.userData.shader.uniforms.uTime.value = t
+        }
+
+        // Emissive pulse + flash
         if (mat) {
-          // Idle emissive pulse (breathing glow)
           const basePulse = 0.3 + Math.sin(t * 2.5) * 0.2
           if (mat.emissive) mat.emissiveIntensity = basePulse + flashRef.current * 3
 
-          // Death fade
           if (hp <= 0) {
             mat.transparent = true
             mat.opacity = THREE.MathUtils.lerp(mat.opacity, 0.15, 0.05)
@@ -173,7 +226,7 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
       }
     })
   })
-
+  
   return (
     <group ref={group} position={[baseX, config.yOffset + centerOffset.y, 0]}>
       <primitive object={clonedScene} scale={autoScale} position={[centerOffset.x, 0, centerOffset.z]} />
