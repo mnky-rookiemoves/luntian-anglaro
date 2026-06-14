@@ -1,6 +1,6 @@
 /**
  * 💀 LUNTIAN ANGLARO — General Detail Page
- * Full lore, stats, 3D model preview, weakness info,
+ * Full lore, stats, 3D model showcase, weakness info,
  * and region details for each General of Pollution.
  */
 import { useParams, useNavigate } from 'react-router-dom'
@@ -34,10 +34,10 @@ const GENERAL_LORE: Record<string, {
     lore_en: [
       'Usok was born when the first factories rose in Metro Manila, their smokestacks belching poison into the sky. As the smog thickened, a consciousness formed within the haze — angry, suffocating, and hungry for more.',
       'He feeds on every exhaust pipe, every burning garbage heap, every coal plant that darkens the Philippine sky. His body is a living storm of particulate matter, carbon monoxide, and sulfur dioxide.',
-      'Where Usok walks, the air turns gray. Birds fall from the sky. Children gasp for breath. He is the reason Manila\'s sunsets are beautiful — and deadly.',
+      'Where Usok walks, the air turns gray. Birds fall from the sky. Children gasp for breath. He is the reason Manila sunsets are beautiful — and deadly.',
     ],
     lore_fil: [
-      'Si Usok ay ipinanganak nang umusbong ang mga unang pabrika sa Metro Manila, ang kanilang mga smokestack ay naglalabas ng lason sa langit. Habang kumakapal ang usok, isang kamalayan ang nabuo sa loob ng hamog — galit, nakakabigat ng paghinga, at gutom pa sa mas marami.',
+      'Si Usok ay ipinanganak nang umusbong ang mga unang pabrika sa Metro Manila, ang kanilang mga smokestack ay naglalabas ng lason sa langit.',
       'Siya ay kumakain mula sa bawat tambutso, bawat nasusunog na basura, bawat planta ng karbon na nagpapadilim sa langit ng Pilipinas.',
       'Kung saan naglalakad si Usok, kulay abo ang hangin. Nahuhulog ang mga ibon mula sa langit. Hinahabol ng mga bata ang kanilang hininga.',
     ],
@@ -59,7 +59,7 @@ const GENERAL_LORE: Record<string, {
       'Every river that feeds into Manila Bay strengthens Mantsa. Every factory that dumps waste feeds its power. It is the living embodiment of water contamination.',
     ],
     lore_fil: [
-      'Si Mantsa ay lumitaw mula sa mga lasonng tubig ng Manila Bay — isang nilalang ng industrial runoff, dumi, at chemical waste.',
+      'Si Mantsa ay lumitaw mula sa mga lason na tubig ng Manila Bay — isang nilalang ng industrial runoff, dumi, at chemical waste.',
       'May dala itong isang corrupted staff na gawa sa mga patay na ugat ng bakawan, na may globo ng concentrated pollution sa dulo.',
       'Bawat ilog na dumadaloy sa Manila Bay ay nagpapalakas kay Mantsa. Bawat pabrika na nagtatapon ng basura ay nagpapakain sa kanyang kapangyarihan.',
     ],
@@ -77,8 +77,8 @@ const GENERAL_LORE: Record<string, {
     origin_fil: 'Ipinanganak mula sa Sugatan na mga Bundok',
     lore_en: [
       'Hukay rose from the scarred mountains of the Cordillera, where illegal mining operations carved deep wounds into the earth. Stone and metal fused with rage to create a golem of destruction.',
-      'Its body is cracked stone laced with glowing orange lava — the earth\'s bleeding wounds made manifest. Rebar and mining equipment jut from its shoulders like broken bones.',
-      'Hukay does not walk — it earthquakes. Every step sends tremors through the ground, collapsing tunnels and swallowing villages. It is the mountain\'s vengeance for humanity\'s greed.',
+      'Its body is cracked stone laced with glowing orange lava — the earth bleeding wounds made manifest. Rebar and mining equipment jut from its shoulders like broken bones.',
+      'Hukay does not walk — it earthquakes. Every step sends tremors through the ground, collapsing tunnels and swallowing villages. It is the mountain vengeance for humanity greed.',
     ],
     lore_fil: [
       'Si Hukay ay bumangon mula sa mga sugatan na bundok ng Cordillera, kung saan kinakahig ng illegal mining ang malalim na sugat sa lupa.',
@@ -98,7 +98,7 @@ const GENERAL_LORE: Record<string, {
     origin_en: 'Born from the Last Ancient Tree',
     origin_fil: 'Ipinanganak mula sa Huling Sinaunang Puno',
     lore_en: [
-      'Putol was once the spirit of an ancient Philippine mahogany — a thousand-year-old tree in the heart of Mindanao\'s rainforest. When illegal loggers cut it down, its spirit did not die. It twisted.',
+      'Putol was once the spirit of an ancient Philippine mahogany — a thousand-year-old tree in the heart of Mindanao rainforest. When illegal loggers cut it down, its spirit did not die. It twisted.',
       'Now Putol is a corrupted treant — its body made of splintered, dead wood, its arms transformed into massive chainsaw blades. It has become the very thing that destroyed it.',
       'It roams the forests of Mindanao, not to protect them, but to finish what the loggers started. In its madness, it believes that if no trees remain, no trees can be hurt.',
     ],
@@ -121,7 +121,7 @@ const GENERAL_LORE: Record<string, {
     origin_fil: 'Ipinanganak mula sa Namamatay na Bahura',
     lore_en: [
       'Lason coalesced from the garbage patches of the Philippine Sea — a kraken-like horror made of plastic bottles, fishing nets, toxic waste, and dead marine life fused together by corruption.',
-      'Its body is a writhing mass of ocean trash with tentacles of tangled debris. A shark\'s jaw protrudes from its face — the last remnant of a great white that choked on plastic bags.',
+      'Its body is a writhing mass of ocean trash with tentacles of tangled debris. A shark jaw protrudes from its face — the last remnant of a great white that choked on plastic bags.',
       'Glowing yellow eyes peer from within the garbage mass, and wherever its tentacles touch, the water turns to poison. Coral bleaches. Fish die. The reef becomes a graveyard.',
     ],
     lore_fil: [
@@ -174,7 +174,7 @@ const THREAT_COLORS: Record<string, string> = {
 export default function GeneralDetailPage() {
   const { generalName } = useParams<{ generalName: string }>()
   const navigate = useNavigate()
-  const { generals, language } = useGameStore()
+  const { generals, guardians, language } = useGameStore()
 
   const general = generals.find((g) => g.name === generalName)
   if (!general) {
@@ -182,7 +182,7 @@ export default function GeneralDetailPage() {
       <div className="p-8 text-center">
         <p className="text-red-400">General not found.</p>
         <button onClick={() => navigate('/generals')} className="mt-4 text-[var(--luntian-primary)] underline">
-          ← Back to Generals
+          Back to Generals
         </button>
       </div>
     )
@@ -191,10 +191,7 @@ export default function GeneralDetailPage() {
   const lore = GENERAL_LORE[general.name]
   const isFil = language === 'fil'
   const threatColor = THREAT_COLORS[general.threat_type] || '#EF5350'
-
-  // Find the guardian weakness
-  const guardianWeakness = general.weakness
-  const weakGuardian = useGameStore.getState().guardians.find(g => g.name === guardianWeakness)
+  const weakGuardian = guardians.find((g) => g.element === general.weakness_element)
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
@@ -203,13 +200,11 @@ export default function GeneralDetailPage() {
         onClick={() => navigate('/generals')}
         className="text-sm text-[var(--luntian-text-muted)] hover:text-red-400 transition-colors"
       >
-        ← {isFil ? 'Bumalik sa mga Heneral' : 'Back to Generals'}
+        {isFil ? '← Bumalik sa mga Heneral' : '← Back to Generals'}
       </button>
 
-      {/* ═══ HEADER ═══ */}
-      <div className="flex items-start gap-6">
-        {/* ═══ 3D MODEL SHOWCASE — Center Stage ═══ */}
-      <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-red-900/30 bg-[#0a0505] mb-6">
+      {/* ═══ 3D MODEL SHOWCASE — Center Stage ═══ */}
+      <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-red-900/30 bg-[#0a0505]">
         <Canvas camera={{ position: [0, 2, 5], fov: 35 }} gl={{ antialias: true }}>
           <Suspense fallback={null}>
             <ambientLight intensity={0.4} />
@@ -218,7 +213,7 @@ export default function GeneralDetailPage() {
             <pointLight position={[2, 1, -2]} intensity={0.4} color={threatColor} />
             <fog attach="fog" args={['#0a0505', 6, 18]} />
 
-            {/* Arena floor for grounding */}
+            {/* Arena floor */}
             <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
               <circleGeometry args={[2.5, 48]} />
               <meshStandardMaterial color="#0d0505" metalness={0.1} roughness={0.9} />
@@ -252,17 +247,17 @@ export default function GeneralDetailPage() {
           </Suspense>
         </Canvas>
 
-        {/* Overlay gradient at bottom for text readability */}
+        {/* Bottom gradient */}
         <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--luntian-bg)] to-transparent pointer-events-none" />
 
         {/* Drag hint */}
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-[var(--luntian-text-muted)]/40 pointer-events-none">
-          🖱️ Drag to rotate • Auto-spinning 360°
+          Drag to rotate - Auto-spinning 360
         </div>
       </div>
 
-      {/* ═══ NAME & TITLE — Below the model ═══ */}
-      <div className="text-center mb-6">
+      {/* ═══ NAME & TITLE — Centered below model ═══ */}
+      <div className="text-center">
         <div className="flex items-center justify-center gap-3 mb-1">
           <span className="text-4xl">{general.emoji}</span>
           <h1 className="text-4xl font-black" style={{ color: threatColor }}>
@@ -290,17 +285,17 @@ export default function GeneralDetailPage() {
                 color: threatColor,
               }}
             >
-              ⚠️ THREAT LEVEL: {lore.threat_level}
+              THREAT LEVEL: {lore.threat_level}
             </span>
           )}
           {general.name === 'ang_dumi' && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-900/20 border border-red-900/40 text-xs font-bold text-red-400">
-              👑 FINAL BOSS
+              FINAL BOSS
             </span>
           )}
         </div>
       </div>
-      
+
       {/* ═══ STATS GRID ═══ */}
       <div className="grid grid-cols-4 gap-3">
         <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
@@ -314,12 +309,12 @@ export default function GeneralDetailPage() {
           <div className="text-[10px] text-[var(--luntian-text-muted)] mt-1">Saga</div>
         </div>
         <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
-          <div className="text-2xl font-black text-[var(--luntian-text)]">Ch. {general.chapter}</div>
+          <div className="text-2xl font-black text-[var(--luntian-text)]">Ch. {general.chapter_number}</div>
           <div className="text-[10px] text-[var(--luntian-text-muted)] mt-1">Chapter</div>
         </div>
         <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
           <div className="text-2xl">📍</div>
-          <div className="text-xs text-[var(--luntian-text-muted)] mt-1">{general.region}</div>
+          <div className="text-xs text-[var(--luntian-text-muted)] mt-1">{general.region_name || 'Unknown'}</div>
         </div>
       </div>
 
@@ -327,7 +322,7 @@ export default function GeneralDetailPage() {
       {weakGuardian && (
         <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-green-900/20">
           <h3 className="text-sm font-bold text-[var(--luntian-primary)] mb-2">
-            ⚡ {isFil ? 'Kahinaan' : 'Weakness'}
+            {isFil ? 'Kahinaan' : 'Weakness'}
           </h3>
           <div className="flex items-center gap-3">
             <span className="text-2xl">{weakGuardian.emoji}</span>
@@ -343,7 +338,7 @@ export default function GeneralDetailPage() {
               onClick={() => navigate(`/guardians/${weakGuardian.name}`)}
               className="ml-auto text-xs px-3 py-1 rounded-lg border border-[var(--luntian-primary)]/30 text-[var(--luntian-primary)] hover:bg-[var(--luntian-primary)]/10 transition-colors"
             >
-              {isFil ? 'Tingnan' : 'View'} →
+              {isFil ? 'Tingnan' : 'View'}
             </button>
           </div>
         </div>
@@ -353,7 +348,7 @@ export default function GeneralDetailPage() {
       {lore && (
         <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
           <h3 className="text-sm font-bold mb-3" style={{ color: threatColor }}>
-            📜 {isFil ? 'Kasaysayan' : 'Lore'}
+            {isFil ? 'Kasaysayan' : 'Lore'}
           </h3>
           <div className="space-y-3">
             {(isFil ? lore.lore_fil : lore.lore_en).map((paragraph, i) => (
@@ -369,7 +364,7 @@ export default function GeneralDetailPage() {
       {lore && (
         <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
           <h3 className="text-sm font-bold mb-3" style={{ color: threatColor }}>
-            ⚔️ {isFil ? 'Mga Kapangyarihan' : 'Powers'}
+            {isFil ? 'Mga Kapangyarihan' : 'Powers'}
           </h3>
           <div className="flex flex-wrap gap-2">
             {lore.powers.map((power, i) => (
@@ -393,7 +388,7 @@ export default function GeneralDetailPage() {
       {lore && (
         <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
           <h3 className="text-sm font-bold mb-2" style={{ color: threatColor }}>
-            🎯 {isFil ? 'Estilo ng Laban' : 'Battle Style'}
+            {isFil ? 'Estilo ng Laban' : 'Battle Style'}
           </h3>
           <p className="text-sm text-[var(--luntian-text-muted)] leading-relaxed">
             {isFil ? lore.battle_style_fil : lore.battle_style_en}
@@ -405,7 +400,7 @@ export default function GeneralDetailPage() {
       {lore && (
         <div className="rounded-xl p-5 bg-red-950/20 border border-red-900/30">
           <h3 className="text-sm font-bold text-red-400 mb-2">
-            ☠️ {isFil ? 'Epekto ng Kabulukan' : 'Corruption Effect'}
+            {isFil ? 'Epekto ng Kabulukan' : 'Corruption Effect'}
           </h3>
           <p className="text-sm text-red-300/70 leading-relaxed">
             {isFil ? lore.corruption_fil : lore.corruption_en}
@@ -420,7 +415,7 @@ export default function GeneralDetailPage() {
           className="px-8 py-3 rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95"
           style={{ backgroundColor: threatColor }}
         >
-          ⚔️ {isFil ? `Labanan si ${general.display_name}` : `Battle ${general.display_name}`}
+          {isFil ? `Labanan si ${general.display_name}` : `Battle ${general.display_name}`}
         </button>
       </div>
     </div>
