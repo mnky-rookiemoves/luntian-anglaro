@@ -14,6 +14,8 @@ import MapPage from '@/pages/MapPage';
 import GuardianDetailPage from '@/pages/GuardianDetailPage';
 import GeneralDetailPage from '@/pages/GeneralDetailPage'
 import BattlePage from '@/pages/BattlePage';
+import StoryModePage from '@/pages/StoryModePage'
+import ChapterReaderPage from '@/pages/ChapterReaderPage'
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/battle" element={<BattlePage />} />
+          <Route path="/story-mode" element={<StoryModePage />} />
+          <Route path="/chapter-reader" element={<ChapterReaderPage />} />
         </Route>
       </Routes>
       <Toaster
