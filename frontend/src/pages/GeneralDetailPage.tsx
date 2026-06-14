@@ -378,7 +378,7 @@ export default function GeneralDetailPage() {
         {/* ── RIGHT COLUMN: 3D Model Portrait ── */}
         <div className="w-1/2 relative border-l border-red-900/15">
           <Canvas
-            camera={{ position: [0, 1, 3.5], fov: 40 }}
+            camera={{ position: [0, 1.2, 4], fov: 65 }}
             gl={{ antialias: true }}
             style={{ background: '#050205' }}
           >
