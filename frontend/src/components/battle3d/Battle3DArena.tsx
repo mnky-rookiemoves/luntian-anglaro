@@ -34,6 +34,113 @@ const ARENA_THEMES: Record<string, {
 
 const DEFAULT_THEME = { floor: '#0d1a0d', ring: '#2E7D32', fog: '#050a05', light1: '#4CAF50', light2: '#EF5350', grid: '#2E7D32' }
 
+/* ═══════════════════════════════════════════════
+   BATTLE SOUND ENGINE (Web Audio API)
+   ═══════════════════════════════════════════════ */
+class BattleAudio {
+  private ctx: AudioContext | null = null
+  private getCtx(): AudioContext {
+    if (!this.ctx) this.ctx = new AudioContext()
+    return this.ctx
+  }
+
+  attack() {
+    try {
+      const c = this.getCtx()
+      // Whoosh
+      const o = c.createOscillator(), g = c.createGain()
+      o.connect(g); g.connect(c.destination)
+      o.type = 'sawtooth'
+      o.frequency.setValueAtTime(300, c.currentTime)
+      o.frequency.exponentialRampToValueAtTime(100, c.currentTime + 0.3)
+      g.gain.setValueAtTime(0.12, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.3)
+      // Impact
+      const o2 = c.createOscillator(), g2 = c.createGain()
+      o2.connect(g2); g2.connect(c.destination)
+      o2.type = 'square'
+      o2.frequency.value = 80
+      g2.gain.setValueAtTime(0.15, c.currentTime + 0.25)
+      g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.5)
+      o2.start(c.currentTime + 0.25); o2.stop(c.currentTime + 0.5)
+    } catch {}
+  }
+
+  hit() {
+    try {
+      const c = this.getCtx()
+      const o = c.createOscillator(), g = c.createGain()
+      o.connect(g); g.connect(c.destination)
+      o.type = 'sine'
+      o.frequency.setValueAtTime(400, c.currentTime)
+      o.frequency.exponentialRampToValueAtTime(150, c.currentTime + 0.15)
+      g.gain.setValueAtTime(0.2, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.15)
+    } catch {}
+  }
+
+  critical() {
+    try {
+      const c = this.getCtx()
+      ;[600, 800, 1000].forEach((f, i) => {
+        const o = c.createOscillator(), g = c.createGain()
+        o.connect(g); g.connect(c.destination)
+        o.type = 'triangle'; o.frequency.value = f
+        const t = c.currentTime + i * 0.06
+        g.gain.setValueAtTime(0.12, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.2)
+        o.start(t); o.stop(t + 0.2)
+      })
+    } catch {}
+  }
+
+  victory() {
+    try {
+      const c = this.getCtx()
+      ;[523, 659, 784, 1047, 1319].forEach((f, i) => {
+        const o = c.createOscillator(), g = c.createGain()
+        o.connect(g); g.connect(c.destination)
+        o.type = 'triangle'; o.frequency.value = f
+        const t = c.currentTime + i * 0.15
+        g.gain.setValueAtTime(0.1, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.6)
+        o.start(t); o.stop(t + 0.6)
+      })
+    } catch {}
+  }
+
+  defeat() {
+    try {
+      const c = this.getCtx()
+      ;[400, 300, 200, 100].forEach((f, i) => {
+        const o = c.createOscillator(), g = c.createGain()
+        o.connect(g); g.connect(c.destination)
+        o.type = 'sawtooth'; o.frequency.value = f
+        const t = c.currentTime + i * 0.2
+        g.gain.setValueAtTime(0.06, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.4)
+        o.start(t); o.stop(t + 0.4)
+      })
+    } catch {}
+  }
+
+  buttonClick() {
+    try {
+      const c = this.getCtx()
+      const o = c.createOscillator(), g = c.createGain()
+      o.connect(g); g.connect(c.destination)
+      o.type = 'sine'; o.frequency.value = 500
+      g.gain.setValueAtTime(0.06, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.08)
+    } catch {}
+  }
+}
+
+const battleAudio = new BattleAudio()
+
 /* ── Attack Projectile ───────────────────────── */
 function AttackProjectile({ from, to, color, onDone }: {
   from: [number, number, number]; to: [number, number, number]; color: string; onDone: () => void
@@ -167,9 +274,17 @@ function SceneContent({
           <ringGeometry args={[4.8, 5.1, 64]} />
           <meshStandardMaterial
             color={theme.ring} emissive={theme.ring}
-            emissiveIntensity={0.6} transparent opacity={0.5}
+            emissiveIntensity={1.5} transparent opacity={0.5}
           />
         </mesh>
+            {/* Inner glow ring */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+            <ringGeometry args={[3.5, 3.8, 64]} />
+            <meshStandardMaterial
+                color={theme.light1} emissive={theme.light1}
+                emissiveIntensity={0.8} transparent opacity={0.3}
+            />
+            </mesh>
         <gridHelper args={[10, 20, `${theme.grid}18`, `${theme.grid}10`]} position={[0, 0.01, 0]} />
       </group>
 
@@ -244,7 +359,11 @@ export default function Battle3DArena({ guardian, general, language, onBattleEnd
   const theme = ARENA_THEMES[general.name] || DEFAULT_THEME
 
   useEffect(() => {
-    if (battleOver && winner) onBattleEnd(winner === 'guardian', stats)
+    if (battleOver && winner) {
+      if (winner === 'guardian') battleAudio.victory()
+      else battleAudio.defeat()
+      onBattleEnd(winner === 'guardian', stats)
+    }
   }, [battleOver, winner])
 
   const hpColor = (hp: number) => (hp > 60 ? '#4CAF50' : hp > 30 ? '#FFD600' : '#EF5350')
@@ -353,7 +472,7 @@ export default function Battle3DArena({ guardian, general, language, onBattleEnd
           {[guardian.power_1, guardian.power_2, guardian.power_3].map((power, i) => (
             <button
               key={i}
-              onClick={() => playerAttack(power, i)}
+              onClick={() => { battleAudio.buttonClick(); playerAttack(power, i) }}
               disabled={!isPlayerTurn}
               className="p-3 rounded-xl border transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
               style={{
