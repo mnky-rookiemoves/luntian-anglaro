@@ -35,8 +35,8 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/battle" element={<BattlePage />} />
-          <Route path="/story-mode" element={<StoryModePage />} />
-          <Route path="/chapter-reader" element={<ChapterReaderPage />} />
+          <Route path="/story" element={<StoryModePage />} />
+          <Route path="/story/:chapterId" element={<ChapterReaderPage />} />
         </Route>
       </Routes>
       <Toaster
