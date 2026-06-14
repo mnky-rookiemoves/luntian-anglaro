@@ -74,8 +74,9 @@ export function isMobile(): boolean {
    HELPERS
    ═══════════════════════════════════════════════ */
 export function hasGLBModel(name: string): boolean {
-  // Don't load heavy .glb files on mobile devices
   if (isMobile()) return false
+  // Check if we're in a battle page — use lightweight procedural models
+  if (typeof window !== 'undefined' && window.location.pathname.includes('/battle')) return false
   return MODEL_REGISTRY[name]?.available ?? false
 }
 

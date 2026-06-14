@@ -47,23 +47,21 @@ class BattleAudio {
   attack() {
     try {
       const c = this.getCtx()
-      // Whoosh
       const o = c.createOscillator(), g = c.createGain()
       o.connect(g); g.connect(c.destination)
       o.type = 'sawtooth'
-      o.frequency.setValueAtTime(300, c.currentTime)
-      o.frequency.exponentialRampToValueAtTime(100, c.currentTime + 0.3)
-      g.gain.setValueAtTime(0.12, c.currentTime)
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.3)
-      o.start(c.currentTime); o.stop(c.currentTime + 0.3)
-      // Impact
+      o.frequency.setValueAtTime(400, c.currentTime)
+      o.frequency.exponentialRampToValueAtTime(120, c.currentTime + 0.3)
+      g.gain.setValueAtTime(0.4, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.35)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.35)
+      // Impact boom
       const o2 = c.createOscillator(), g2 = c.createGain()
       o2.connect(g2); g2.connect(c.destination)
-      o2.type = 'square'
-      o2.frequency.value = 80
-      g2.gain.setValueAtTime(0.15, c.currentTime + 0.25)
-      g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.5)
-      o2.start(c.currentTime + 0.25); o2.stop(c.currentTime + 0.5)
+      o2.type = 'square'; o2.frequency.value = 60
+      g2.gain.setValueAtTime(0.5, c.currentTime + 0.25)
+      g2.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.6)
+      o2.start(c.currentTime + 0.25); o2.stop(c.currentTime + 0.6)
     } catch {}
   }
 
@@ -73,25 +71,25 @@ class BattleAudio {
       const o = c.createOscillator(), g = c.createGain()
       o.connect(g); g.connect(c.destination)
       o.type = 'sine'
-      o.frequency.setValueAtTime(400, c.currentTime)
-      o.frequency.exponentialRampToValueAtTime(150, c.currentTime + 0.15)
-      g.gain.setValueAtTime(0.2, c.currentTime)
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.15)
-      o.start(c.currentTime); o.stop(c.currentTime + 0.15)
+      o.frequency.setValueAtTime(500, c.currentTime)
+      o.frequency.exponentialRampToValueAtTime(100, c.currentTime + 0.2)
+      g.gain.setValueAtTime(0.5, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.2)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.2)
     } catch {}
   }
 
   critical() {
     try {
       const c = this.getCtx()
-      ;[600, 800, 1000].forEach((f, i) => {
+      ;[600, 900, 1200].forEach((f, i) => {
         const o = c.createOscillator(), g = c.createGain()
         o.connect(g); g.connect(c.destination)
         o.type = 'triangle'; o.frequency.value = f
         const t = c.currentTime + i * 0.06
-        g.gain.setValueAtTime(0.12, t)
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.2)
-        o.start(t); o.stop(t + 0.2)
+        g.gain.setValueAtTime(0.35, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.25)
+        o.start(t); o.stop(t + 0.25)
       })
     } catch {}
   }
@@ -104,9 +102,9 @@ class BattleAudio {
         o.connect(g); g.connect(c.destination)
         o.type = 'triangle'; o.frequency.value = f
         const t = c.currentTime + i * 0.15
-        g.gain.setValueAtTime(0.1, t)
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.6)
-        o.start(t); o.stop(t + 0.6)
+        g.gain.setValueAtTime(0.3, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.7)
+        o.start(t); o.stop(t + 0.7)
       })
     } catch {}
   }
@@ -114,14 +112,14 @@ class BattleAudio {
   defeat() {
     try {
       const c = this.getCtx()
-      ;[400, 300, 200, 100].forEach((f, i) => {
+      ;[400, 300, 200, 80].forEach((f, i) => {
         const o = c.createOscillator(), g = c.createGain()
         o.connect(g); g.connect(c.destination)
         o.type = 'sawtooth'; o.frequency.value = f
         const t = c.currentTime + i * 0.2
-        g.gain.setValueAtTime(0.06, t)
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.4)
-        o.start(t); o.stop(t + 0.4)
+        g.gain.setValueAtTime(0.2, t)
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.5)
+        o.start(t); o.stop(t + 0.5)
       })
     } catch {}
   }
@@ -131,10 +129,10 @@ class BattleAudio {
       const c = this.getCtx()
       const o = c.createOscillator(), g = c.createGain()
       o.connect(g); g.connect(c.destination)
-      o.type = 'sine'; o.frequency.value = 500
-      g.gain.setValueAtTime(0.06, c.currentTime)
-      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.08)
-      o.start(c.currentTime); o.stop(c.currentTime + 0.08)
+      o.type = 'sine'; o.frequency.value = 600
+      g.gain.setValueAtTime(0.15, c.currentTime)
+      g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.1)
+      o.start(c.currentTime); o.stop(c.currentTime + 0.1)
     } catch {}
   }
 }
@@ -265,27 +263,67 @@ function SceneContent({
       <fog attach="fog" args={[theme.fog, 8, 20]} />
 
       {/* Themed Arena Floor */}
+      {/* ═══ THEMED TERRAIN ═══ */}
       <group>
+        {/* Main ground */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow position={[0, -0.01, 0]}>
-          <circleGeometry args={[5, 64]} />
-          <meshStandardMaterial color={theme.floor} metalness={0.1} roughness={0.9} />
+          <circleGeometry args={[6, 64]} />
+          <meshStandardMaterial color={theme.floor} metalness={0.15} roughness={0.85} />
         </mesh>
+
+        {/* Outer glow ring */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-          <ringGeometry args={[4.8, 5.1, 64]} />
-          <meshStandardMaterial
-            color={theme.ring} emissive={theme.ring}
-            emissiveIntensity={1.5} transparent opacity={0.5}
-          />
+          <ringGeometry args={[4.5, 5.2, 64]} />
+          <meshStandardMaterial color={theme.ring} emissive={theme.ring} emissiveIntensity={1.5} transparent opacity={0.5} />
         </mesh>
-            {/* Inner glow ring */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-            <ringGeometry args={[3.5, 3.8, 64]} />
-            <meshStandardMaterial
-                color={theme.light1} emissive={theme.light1}
-                emissiveIntensity={0.8} transparent opacity={0.3}
-            />
-            </mesh>
-        <gridHelper args={[10, 20, `${theme.grid}18`, `${theme.grid}10`]} position={[0, 0.01, 0]} />
+
+        {/* Inner glow ring */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
+          <ringGeometry args={[3.2, 3.6, 64]} />
+          <meshStandardMaterial color={theme.light1} emissive={theme.light1} emissiveIntensity={0.8} transparent opacity={0.3} />
+        </mesh>
+
+        {/* Grid */}
+        <gridHelper args={[12, 24, `${theme.grid}20`, `${theme.grid}10`]} position={[0, 0.02, 0]} />
+
+        {/* ── TERRAIN PILLARS — themed per General ── */}
+        {/* Back-left pillar */}
+        <mesh position={[-4, 0.8, -3]} castShadow>
+          <cylinderGeometry args={[0.15, 0.25, 1.6, 6]} />
+          <meshStandardMaterial color={theme.ring} emissive={theme.light1} emissiveIntensity={0.4} flatShading />
+        </mesh>
+        <mesh position={[-4, 1.7, -3]}>
+          <sphereGeometry args={[0.15, 8, 8]} />
+          <meshStandardMaterial color={theme.light1} emissive={theme.light1} emissiveIntensity={2} transparent opacity={0.7} />
+        </mesh>
+
+        {/* Back-right pillar */}
+        <mesh position={[4, 0.8, -3]} castShadow>
+          <cylinderGeometry args={[0.15, 0.25, 1.6, 6]} />
+          <meshStandardMaterial color={theme.ring} emissive={theme.light2} emissiveIntensity={0.4} flatShading />
+        </mesh>
+        <mesh position={[4, 1.7, -3]}>
+          <sphereGeometry args={[0.15, 8, 8]} />
+          <meshStandardMaterial color={theme.light2} emissive={theme.light2} emissiveIntensity={2} transparent opacity={0.7} />
+        </mesh>
+
+        {/* Side pillars */}
+        <mesh position={[-5, 0.5, 0]} castShadow>
+          <cylinderGeometry args={[0.1, 0.2, 1, 5]} />
+          <meshStandardMaterial color={theme.floor} emissive={theme.light1} emissiveIntensity={0.3} flatShading />
+        </mesh>
+        <mesh position={[5, 0.5, 0]} castShadow>
+          <cylinderGeometry args={[0.1, 0.2, 1, 5]} />
+          <meshStandardMaterial color={theme.floor} emissive={theme.light2} emissiveIntensity={0.3} flatShading />
+        </mesh>
+
+        {/* Floating rocks/debris around the arena */}
+        {[[-3, 0.3, 2], [3.5, 0.2, 1.5], [-2, 0.15, -2.5], [2.5, 0.25, -1.5], [0, 0.1, 3]].map((pos, i) => (
+          <mesh key={i} position={pos as [number, number, number]} rotation={[Math.random(), Math.random(), 0]}>
+            <dodecahedronGeometry args={[0.12 + Math.random() * 0.1, 0]} />
+            <meshStandardMaterial color={theme.ring} emissive={theme.light1} emissiveIntensity={0.2} flatShading transparent opacity={0.6} />
+          </mesh>
+        ))}
       </group>
 
       {/* Themed Fireflies */}
@@ -381,7 +419,11 @@ export default function Battle3DArena({ guardian, general, language, onBattleEnd
 
       {/* 3D Viewport */}
       <div className="w-full h-[420px] rounded-2xl overflow-hidden border mb-4 relative"
-        style={{ borderColor: `${theme.ring}40`, backgroundColor: theme.fog }}>
+        style={{
+            borderColor: `${theme.ring}60`,
+            background: `radial-gradient(ellipse at center, ${theme.fog} 0%, ${theme.floor} 60%, #000000 100%)`,
+            boxShadow: `inset 0 0 60px ${theme.ring}15, 0 0 20px ${theme.ring}10`,
+        }}>
         <Canvas camera={{ position: [0, 4, 8], fov: 42 }} shadows gl={{ antialias: true }}>
           <Suspense fallback={null}>
             <SceneContent
