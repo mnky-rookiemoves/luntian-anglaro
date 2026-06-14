@@ -1,13 +1,15 @@
 /**
  * 🛡️ LUNTIAN ANGLARO — Guardian Detail Page
- * Full lore, powers breakdown, and regional connection
+ * Split layout: Details LEFT, 3D model portrait RIGHT
  */
-
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useGameStore } from '@/store';
-import { ELEMENT_CONFIG } from '@/types/game.types';
-import type { Guardian, General } from '@/types/game.types';
+import { useEffect, useState, Suspense } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Canvas } from '@react-three/fiber'
+import { OrbitControls } from '@react-three/drei'
+import { useGameStore } from '@/store'
+import { ELEMENT_CONFIG } from '@/types/game.types'
+import { GuardianModelLookup } from '@/components/battle3d/GuardianModels'
+import type { Guardian, General } from '@/types/game.types'
 
 const POWER_DESCRIPTIONS: Record<string, Record<string, { desc: string; descFil: string; type: string }>> = {
   luntian: {
@@ -35,7 +37,7 @@ const POWER_DESCRIPTIONS: Record<string, Record<string, { desc: string; descFil:
     'Deep Current': { desc: 'Creates underwater currents that slow and damage enemies.', descFil: 'Gumawa ng mga agos sa ilalim ng tubig na nagpapabagal at nagpipinsala sa mga kalaban.', type: 'CC + Damage' },
     'Bubble Trap': { desc: 'Traps enemies in inescapable bubbles, stunning them.', descFil: 'Nikulong ang mga kalaban sa mga bula na hindi matatakasan, na-stun sila.', type: 'CC + Stun' },
   },
-};
+}
 
 const GUARDIAN_LORE: Record<string, { en: string; fil: string }> = {
   luntian: {
@@ -58,30 +60,29 @@ const GUARDIAN_LORE: Record<string, { en: string; fil: string }> = {
     en: 'Pawikan is the ancient marine spirit — a sea turtle that has swum the Philippine seas for over 10,000 years. Pawikan remembers when the coral was vibrant and the waters were clear. Now, navigating through plastic waste and oil slicks, Pawikan\'s shell is cracked and scarred. In the depths of Tubbataha Reef, Pawikan guards the last pristine corals, waiting for a hero who can turn the tide.',
     fil: 'Si Pawikan ay ang sinaunang espiritu ng karagatan — isang pagong-dagat na lumangoy sa mga dagat ng Pilipinas sa loob ng mahigit 10,000 taon. Naaalala ni Pawikan noong makulay ang korales at malinaw ang tubig. Ngayon, habang naglalayag sa mga basura ng plastik at langis, basag at may gasgas ang balat ni Pawikan. Sa kailaliman ng Tubbataha Reef, binabantayan ni Pawikan ang huling malinis na korales.',
   },
-};
+}
 
 const GuardianDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const { guardians, generals, regions, initialize, isInitialized, language } = useGameStore();
-  const [guardian, setGuardian] = useState<Guardian | null>(null);
-  const [nemesis, setNemesis] = useState<General | null>(null);
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { guardians, generals, regions, initialize, isInitialized, language } = useGameStore()
+  const [guardian, setGuardian] = useState<Guardian | null>(null)
+  const [nemesis, setNemesis] = useState<General | null>(null)
 
   useEffect(() => {
-    if (!isInitialized) initialize();
-  }, [initialize, isInitialized]);
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
 
   useEffect(() => {
     if (guardians.length > 0 && id) {
-      const g = guardians.find((g) => g.id === Number(id));
+      const g = guardians.find((g) => g.id === Number(id))
       if (g) {
-        setGuardian(g);
-        // Find the general in the same region
-        const gen = generals.find((gen) => gen.region_name === g.region_name);
-        setNemesis(gen || null);
+        setGuardian(g)
+        const gen = generals.find((gen) => gen.region_name === g.region_name)
+        setNemesis(gen || null)
       }
     }
-  }, [guardians, generals, id]);
+  }, [guardians, generals, id])
 
   if (!guardian) {
     return (
@@ -89,54 +90,44 @@ const GuardianDetailPage = () => {
         <div className="text-6xl mb-4">🔮</div>
         <p className="text-[var(--luntian-text-muted)]">Guardian not found...</p>
       </div>
-    );
+    )
   }
 
-  const config = ELEMENT_CONFIG[guardian.element];
-  const powers = POWER_DESCRIPTIONS[guardian.name] || {};
-  const lore = GUARDIAN_LORE[guardian.name];
-  const region = regions.find((r) => r.name === guardian.region_name);
+  const config = ELEMENT_CONFIG[guardian.element]
+  const powers = POWER_DESCRIPTIONS[guardian.name] || {}
+  const lore = GUARDIAN_LORE[guardian.name]
+  const region = regions.find((r) => r.name === guardian.region_name)
+  const isFil = language === 'fil'
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Back button */}
-      <button
-        onClick={() => navigate('/guardians')}
-        className="text-sm text-[var(--luntian-text-muted)] hover:text-[var(--luntian-primary-light)] transition-colors mb-6 flex items-center gap-1"
-      >
-        ← {language === 'en' ? 'Back to Guardians' : 'Bumalik sa mga Tagapag-alaga'}
-      </button>
+    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+      {/* Back Button */}
+      <div className="px-6 py-3 flex-shrink-0">
+        <button
+          onClick={() => navigate('/guardians')}
+          className="text-sm text-[var(--luntian-text-muted)] hover:text-[var(--luntian-primary-light)] transition-colors"
+        >
+          {isFil ? '← Bumalik sa mga Tagapag-alaga' : '← Back to Guardians'}
+        </button>
+      </div>
 
-      {/* Hero Card */}
-      <div
-        className="rounded-2xl p-8 border mb-8"
-        style={{
-          backgroundColor: `${config.bgColor}22`,
-          borderColor: `${config.color}44`,
-          boxShadow: `0 0 40px ${config.color}11`,
-        }}
-      >
-        <div className="flex flex-col md:flex-row items-center gap-6">
-          {/* Avatar */}
-          <div
-            className="w-28 h-28 rounded-2xl flex items-center justify-center text-6xl border-2"
-            style={{
-              backgroundColor: `${config.bgColor}44`,
-              borderColor: `${config.color}66`,
-              boxShadow: `0 0 20px ${config.color}33`,
-            }}
-          >
-            {config.emoji}
-          </div>
+      {/* MAIN SPLIT LAYOUT */}
+      <div className="flex-1 flex overflow-hidden">
 
-          {/* Info */}
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-4xl font-bold" style={{ color: config.color }}>
-              {guardian.display_name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-3 mt-2 justify-center md:justify-start">
+        {/* LEFT COLUMN: Details */}
+        <div className="w-1/2 overflow-y-auto px-6 pb-6 space-y-4">
+
+          {/* Name & Info */}
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-3xl">{config.emoji}</span>
+              <h1 className="text-3xl font-black" style={{ color: config.color }}>
+                {guardian.display_name}
+              </h1>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
               <span
-                className="px-3 py-1 rounded-full text-sm font-medium"
+                className="px-2.5 py-0.5 rounded-full text-xs font-medium"
                 style={{
                   color: config.color,
                   backgroundColor: `${config.color}22`,
@@ -145,149 +136,184 @@ const GuardianDetailPage = () => {
               >
                 {guardian.element_display}
               </span>
-              <span className="text-sm text-[var(--luntian-text-muted)]">
+              <span className="text-xs text-[var(--luntian-text-muted)]">
                 {guardian.combat_role_display}
               </span>
-              <span className="text-sm text-[var(--luntian-text-muted)]">
-                • Ch.{guardian.awakening_chapter}
+              <span className="text-xs text-[var(--luntian-text-muted)]">
+                Ch.{guardian.awakening_chapter}
               </span>
             </div>
-            <p className="text-sm text-[var(--luntian-text-muted)] mt-3">
-              {language === 'fil' && guardian.description_filipino
+            <p className="text-sm text-[var(--luntian-text-muted)] mt-2">
+              {isFil && guardian.description_filipino
                 ? guardian.description_filipino
                 : guardian.description}
             </p>
           </div>
-        </div>
-      </div>
 
-      {/* Content Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Powers */}
-        <div className="rounded-2xl p-6 bg-[var(--luntian-surface)] border border-[var(--luntian-primary)]/20">
-          <h2 className="text-lg font-semibold text-[var(--luntian-text)] mb-4">
-            ⚡ {language === 'en' ? 'Powers' : 'Kapangyarihan'}
-          </h2>
-          <div className="space-y-4">
-            {[guardian.power_1, guardian.power_2, guardian.power_3].map((power, i) => {
-              const info = powers[power];
-              return (
-                <div
-                  key={i}
-                  className="rounded-xl p-4 border"
-                  style={{
-                    backgroundColor: `${config.color}08`,
-                    borderColor: `${config.color}22`,
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <h3 className="font-bold text-sm" style={{ color: config.color }}>
-                      {power}
-                    </h3>
+          {/* Powers */}
+          <div className="rounded-lg p-4 bg-[var(--luntian-surface)] border border-[var(--luntian-primary)]/20">
+            <h2 className="text-xs font-bold text-[var(--luntian-text)] mb-3">
+              {isFil ? 'Mga Kapangyarihan' : 'Powers'}
+            </h2>
+            <div className="space-y-3">
+              {[guardian.power_1, guardian.power_2, guardian.power_3].map((power, i) => {
+                const info = powers[power]
+                return (
+                  <div
+                    key={i}
+                    className="rounded-lg p-3 border"
+                    style={{
+                      backgroundColor: `${config.color}08`,
+                      borderColor: `${config.color}22`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-0.5">
+                      <h3 className="font-bold text-sm" style={{ color: config.color }}>
+                        {power}
+                      </h3>
+                      {info && (
+                        <span
+                          className="text-[9px] px-2 py-0.5 rounded-full"
+                          style={{
+                            color: config.color,
+                            backgroundColor: `${config.color}15`,
+                          }}
+                        >
+                          {info.type}
+                        </span>
+                      )}
+                    </div>
                     {info && (
-                      <span
-                        className="text-[10px] px-2 py-0.5 rounded-full"
-                        style={{
-                          color: config.color,
-                          backgroundColor: `${config.color}15`,
-                        }}
-                      >
-                        {info.type}
-                      </span>
+                      <p className="text-xs text-[var(--luntian-text-muted)]">
+                        {isFil ? info.descFil : info.desc}
+                      </p>
                     )}
                   </div>
-                  {info && (
-                    <p className="text-xs text-[var(--luntian-text-muted)] mt-1">
-                      {language === 'fil' ? info.descFil : info.desc}
-                    </p>
-                  )}
-                </div>
-              );
-            })}
+                )
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Lore */}
-        <div className="rounded-2xl p-6 bg-[var(--luntian-surface)] border border-[var(--luntian-primary)]/20">
-          <h2 className="text-lg font-semibold text-[var(--luntian-text)] mb-4">
-            📜 {language === 'en' ? 'Lore' : 'Kasaysayan'}
-          </h2>
-          {lore ? (
-            <p className="text-sm text-[var(--luntian-text-muted)] leading-relaxed italic">
-              "{language === 'fil' ? lore.fil : lore.en}"
-            </p>
-          ) : (
-            <p className="text-sm text-[var(--luntian-text-muted)]">
-              {language === 'en' ? 'Lore not yet discovered...' : 'Hindi pa natutuklasan ang kasaysayan...'}
-            </p>
+          {/* Lore */}
+          {lore && (
+            <div className="rounded-lg p-4 bg-[var(--luntian-surface)] border border-[var(--luntian-primary)]/20">
+              <h2 className="text-xs font-bold text-[var(--luntian-text)] mb-2">
+                {isFil ? 'Kasaysayan' : 'Lore'}
+              </h2>
+              <p className="text-xs text-[var(--luntian-text-muted)] leading-relaxed italic">
+                {isFil ? lore.fil : lore.en}
+              </p>
+            </div>
           )}
 
           {/* Region Connection */}
           {region && (
-            <div className="mt-6 rounded-xl p-4 bg-[var(--luntian-primary)]/5 border border-[var(--luntian-primary)]/20">
-              <h3 className="text-xs font-semibold text-[var(--luntian-text-muted)] uppercase tracking-wider mb-2">
-                📍 {language === 'en' ? 'Home Region' : 'Rehiyong Tahanan'}
+            <div className="rounded-lg p-3 bg-[var(--luntian-primary)]/5 border border-[var(--luntian-primary)]/20">
+              <h3 className="text-[10px] font-semibold text-[var(--luntian-text-muted)] uppercase tracking-wider mb-1">
+                {isFil ? 'Rehiyong Tahanan' : 'Home Region'}
               </h3>
               <div className="text-sm font-bold text-[var(--luntian-primary-light)]">
-                {language === 'fil' && region.name_filipino ? region.name_filipino : region.name}
+                {isFil && region.name_filipino ? region.name_filipino : region.name}
               </div>
-              <div className="text-xs text-[var(--luntian-text-muted)] mt-1">
-                Saga {region.saga} • {language === 'en' ? 'Chapter' : 'Kabanata'} {region.chapter_number}
+              <div className="text-xs text-[var(--luntian-text-muted)] mt-0.5">
+                Saga {region.saga} - {isFil ? 'Kabanata' : 'Chapter'} {region.chapter_number}
               </div>
             </div>
           )}
 
           {/* Nemesis */}
           {nemesis && (
-            <div className="mt-4 rounded-xl p-4 bg-red-950/20 border border-red-900/30">
-              <h3 className="text-xs font-semibold text-red-400/60 uppercase tracking-wider mb-2">
-                💀 {language === 'en' ? 'Nemesis' : 'Kaaway'}
+            <div
+              className="rounded-lg p-3 bg-red-950/20 border border-red-900/30 cursor-pointer hover:bg-red-950/30 transition-colors"
+              onClick={() => navigate(`/generals/${nemesis.name}`)}
+            >
+              <h3 className="text-[10px] font-semibold text-red-400/60 uppercase tracking-wider mb-1">
+                {isFil ? 'Kaaway' : 'Nemesis'}
               </h3>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold text-red-400">{nemesis.display_name}</span>
                 <span className="text-xs text-red-300/60">{nemesis.threat_display}</span>
+                <span className="ml-auto text-[10px] text-red-400/40">View →</span>
               </div>
               <p className="text-xs text-[var(--luntian-text-muted)] mt-1">
-                {language === 'fil' && nemesis.description_filipino
+                {isFil && nemesis.description_filipino
                   ? nemesis.description_filipino
                   : nemesis.description}
               </p>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* Other Guardians Navigation */}
-      <div className="mt-8">
-        <h3 className="text-sm font-semibold text-[var(--luntian-text-muted)] mb-3">
-          🛡️ {language === 'en' ? 'Other Guardians' : 'Iba pang Tagapag-alaga'}
-        </h3>
-        <div className="flex gap-3">
-          {guardians
-            .filter((g) => g.id !== guardian.id)
-            .map((g) => {
-              const c = ELEMENT_CONFIG[g.element];
-              return (
-                <button
-                  key={g.id}
-                  onClick={() => navigate(`/guardians/${g.id}`)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl border transition-all hover:scale-105"
-                  style={{
-                    backgroundColor: `${c.bgColor}18`,
-                    borderColor: `${c.color}33`,
-                  }}
-                >
-                  <span className="text-xl">{c.emoji}</span>
-                  <span className="text-sm font-medium" style={{ color: c.color }}>
-                    {g.display_name}
-                  </span>
-                </button>
-              );
-            })}
+          {/* Battle Button */}
+          <div className="pt-1 pb-4">
+            <button
+              onClick={() => navigate('/battle')}
+              className="w-full py-3 rounded-xl font-bold text-white transition-all hover:scale-[1.02] active:scale-95"
+              style={{ backgroundColor: config.color }}
+            >
+              {isFil ? `Ipaglaban si ${guardian.display_name}` : `Battle with ${guardian.display_name}`}
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN: 3D Model Portrait */}
+        <div className="w-1/2 relative border-l border-[var(--luntian-primary)]/15">
+          <Canvas
+            camera={{ position: [0, 1.2, 4], fov: 65 }}
+            gl={{ antialias: true }}
+            style={{ background: '#030a03' }}
+          >
+            <Suspense fallback={null}>
+              <ambientLight intensity={0.4} />
+              <directionalLight position={[3, 5, 2]} intensity={1.2} />
+              <pointLight position={[-2, 2, 3]} intensity={0.8} color={config.color} />
+              <pointLight position={[2, 0, -2]} intensity={0.4} color={config.color} />
+              <fog attach="fog" args={['#030a03', 5, 14]} />
+
+              {/* Arena floor */}
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+                <circleGeometry args={[1.5, 48]} />
+                <meshStandardMaterial color="#050a05" metalness={0.1} roughness={0.9} />
+              </mesh>
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]}>
+                <ringGeometry args={[1.35, 1.5, 48]} />
+                <meshStandardMaterial
+                  color={config.color}
+                  emissive={config.color}
+                  emissiveIntensity={0.8}
+                  transparent
+                  opacity={0.5}
+                />
+              </mesh>
+
+              <GuardianModelLookup
+                name={guardian.name}
+                animPhase="idle"
+                hp={100}
+                role="guardian"
+                baseX={0}
+              />
+              <OrbitControls
+                enablePan={false}
+                autoRotate
+                autoRotateSpeed={1}
+                enableZoom={false}
+                minPolarAngle={Math.PI / 5}
+                maxPolarAngle={Math.PI / 2.3}
+              />
+            </Suspense>
+          </Canvas>
+
+          {/* Drag hint */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-[var(--luntian-text-muted)]/30 pointer-events-none">
+            Drag to rotate
+          </div>
+
+          {/* Side gradient blend */}
+          <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-[var(--luntian-bg)] to-transparent pointer-events-none" />
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default GuardianDetailPage;
+export default GuardianDetailPage
