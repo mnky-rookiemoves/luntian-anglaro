@@ -330,10 +330,12 @@ function SceneContent({
   return (
     <>
       {/* Lighting */}
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[5, 8, 3]} intensity={1.2} castShadow shadow-mapSize={1024} />
-      <pointLight position={[-3, 3, 1]} intensity={0.6} color={gConf.color} />
-      <pointLight position={[3, 3, 1]} intensity={0.6} color="#EF5350" />
+      <ambientLight intensity={0.8} />
+        <directionalLight position={[5, 8, 3]} intensity={1.8} castShadow shadow-mapSize={1024} />
+        <directionalLight position={[-3, 4, -2]} intensity={0.8} />
+        <pointLight position={[-3, 3, 1]} intensity={1.2} color={gConf.color} />
+        <pointLight position={[3, 3, 1]} intensity={1.2} color="#EF5350" />
+        <pointLight position={[0, 1, 4]} intensity={0.6} color="#ffffff" />
 
       {/* Arena */}
       <ArenaFloor />

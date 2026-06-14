@@ -383,10 +383,12 @@ export default function GeneralDetailPage() {
             style={{ background: '#050205' }}
           >
             <Suspense fallback={null}>
-              <ambientLight intensity={0.4} />
-              <directionalLight position={[3, 5, 2]} intensity={1.2} />
-              <pointLight position={[-2, 2, 3]} intensity={0.8} color={threatColor} />
-              <pointLight position={[2, 0, -2]} intensity={0.4} color={threatColor} />
+              <ambientLight intensity={1.2} />
+                <directionalLight position={[3, 5, 2]} intensity={2} />
+                <directionalLight position={[-3, 3, -2]} intensity={1} />
+                <pointLight position={[-2, 2, 3]} intensity={1.5} color={threatColor} />
+                <pointLight position={[2, 1, -2]} intensity={1} color={threatColor} />
+                <pointLight position={[0, -1, 2]} intensity={0.8} color="#ffffff" />
               <fog attach="fog" args={['#050205', 5, 14]} />
 
               {/* Small arena floor */}

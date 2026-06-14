@@ -263,10 +263,12 @@ const GuardianDetailPage = () => {
             style={{ background: '#030a03' }}
           >
             <Suspense fallback={null}>
-              <ambientLight intensity={0.4} />
-              <directionalLight position={[3, 5, 2]} intensity={1.2} />
-              <pointLight position={[-2, 2, 3]} intensity={0.8} color={config.color} />
-              <pointLight position={[2, 0, -2]} intensity={0.4} color={config.color} />
+              <ambientLight intensity={1.2} />
+                <directionalLight position={[3, 5, 2]} intensity={2} />
+                <directionalLight position={[-3, 3, -2]} intensity={1} />
+                <pointLight position={[-2, 2, 3]} intensity={1.5} color={config.color} />
+                <pointLight position={[2, 1, -2]} intensity={1} color={config.color} />
+                <pointLight position={[0, -1, 2]} intensity={0.8} color="#ffffff" />
               <fog attach="fog" args={['#030a03', 5, 14]} />
 
               {/* Arena floor */}

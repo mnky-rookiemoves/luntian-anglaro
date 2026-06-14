@@ -35,17 +35,17 @@ export const MODEL_REGISTRY: Record<string, {
    COLOR MAP — applies colors to untextured .glb models
    ═══════════════════════════════════════════════ */
 const MODEL_COLORS: Record<string, { primary: string; emissive: string; emissiveIntensity: number }> = {
-  luntian:  { primary: '#4CAF50', emissive: '#2E7D32', emissiveIntensity: 0.3 },
-  alon:     { primary: '#42A5F5', emissive: '#1565C0', emissiveIntensity: 0.4 },
-  bulkan:   { primary: '#8D6E63', emissive: '#BF360C', emissiveIntensity: 0.3 },
-  haribon:  { primary: '#A1887F', emissive: '#4CAF50', emissiveIntensity: 0.2 },
-  pawikan:  { primary: '#5D7B6F', emissive: '#FFB300', emissiveIntensity: 0.2 },
-  usok:     { primary: '#37474F', emissive: '#FF1744', emissiveIntensity: 0.4 },
-  mantsa:   { primary: '#1A237E', emissive: '#7B1FA2', emissiveIntensity: 0.3 },
-  hukay:    { primary: '#424242', emissive: '#FF6D00', emissiveIntensity: 0.4 },
-  putol:    { primary: '#4E342E', emissive: '#FF8F00', emissiveIntensity: 0.3 },
-  lason:    { primary: '#1a2e1a', emissive: '#FFAB00', emissiveIntensity: 0.3 },
-  ang_dumi: { primary: '#1a1a2e', emissive: '#7B1FA2', emissiveIntensity: 0.5 },
+  luntian:  { primary: '#81C784', emissive: '#4CAF50', emissiveIntensity: 0.5 },
+  alon:     { primary: '#64B5F6', emissive: '#2196F3', emissiveIntensity: 0.6 },
+  bulkan:   { primary: '#A1887F', emissive: '#FF5722', emissiveIntensity: 0.5 },
+  haribon:  { primary: '#C8B89A', emissive: '#8BC34A', emissiveIntensity: 0.4 },
+  pawikan:  { primary: '#80CBC4', emissive: '#FFD600', emissiveIntensity: 0.4 },
+  usok:     { primary: '#90A4AE', emissive: '#FF5252', emissiveIntensity: 0.7 },
+  mantsa:   { primary: '#9575CD', emissive: '#E040FB', emissiveIntensity: 0.7 },
+  hukay:    { primary: '#A1887F', emissive: '#FF9100', emissiveIntensity: 0.7 },
+  putol:    { primary: '#8D6E63', emissive: '#FFAB00', emissiveIntensity: 0.6 },
+  lason:    { primary: '#4DB6AC', emissive: '#FFEB3B', emissiveIntensity: 0.6 },
+  ang_dumi: { primary: '#7E57C2', emissive: '#D500F9', emissiveIntensity: 0.8 },
 }
 
 /* ═══════════════════════════════════════════════
@@ -122,10 +122,18 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
     if (!group.current) return
     const t = state.clock.elapsedTime
 
-    // Bob
-    group.current.position.y = config.yOffset + centerOffset.y + Math.sin(t * 2) * 0.1
+    // ── Idle Bob (up and down) ──
+    group.current.position.y = config.yOffset + centerOffset.y + Math.sin(t * 1.5) * 0.12
 
-    // Lunge
+    // ── Idle Breathing (scale pulse) ──
+    const breathScale = 1.0 + Math.sin(t * 2) * 0.03
+    group.current.scale.set(breathScale, breathScale, breathScale)
+
+    // ── Idle Sway (gentle lean) ──
+    group.current.rotation.z = Math.sin(t * 0.8) * 0.03
+    group.current.rotation.x = Math.cos(t * 0.6) * 0.02
+
+    // ── Lunge toward enemy when attacking ──
     const isAttacking =
       (role === 'guardian' && animPhase === 'player_attacking') ||
       (role === 'general' && animPhase === 'enemy_attacking')
@@ -136,10 +144,10 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
       group.current.position.x, targetX, 0.12,
     )
 
-    // Slow rotation
+    // ── Slow auto-rotation ──
     group.current.rotation.y += delta * (role === 'general' ? -0.3 : 0.3)
 
-    // Hit flash
+    // ── Hit flash ──
     const isMyHit =
       (role === 'guardian' && animPhase === 'enemy_hit') ||
       (role === 'general' && animPhase === 'player_hit')
@@ -147,12 +155,16 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
     prevPhase.current = animPhase
     flashRef.current = Math.max(0, flashRef.current - delta * 4)
 
-    // Apply flash + death to materials
+    // ── Apply emissive pulse + flash + death ──
     group.current.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial
         if (mat) {
-          if (mat.emissive) mat.emissiveIntensity = flashRef.current * 2
+          // Idle emissive pulse (breathing glow)
+          const basePulse = 0.3 + Math.sin(t * 2.5) * 0.2
+          if (mat.emissive) mat.emissiveIntensity = basePulse + flashRef.current * 3
+
+          // Death fade
           if (hp <= 0) {
             mat.transparent = true
             mat.opacity = THREE.MathUtils.lerp(mat.opacity, 0.15, 0.05)
