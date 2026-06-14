@@ -12,6 +12,7 @@ import CreatePlayerPage from '@/pages/CreatePlayerPage';
 import ProfilePage from '@/pages/ProfilePage';
 import MapPage from '@/pages/MapPage';
 import GuardianDetailPage from '@/pages/GuardianDetailPage';
+import GeneralDetailPage from '@/pages/GeneralDetailPage'
 import BattlePage from '@/pages/BattlePage';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/guardians" element={<GuardiansPage />} />
           <Route path="/guardians/:id" element={<GuardianDetailPage />} />
           <Route path="/generals" element={<GeneralsPage />} />
+          <Route path="/generals/:generalName" element={<GeneralDetailPage />} />
           <Route path="/regions" element={<RegionsPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />

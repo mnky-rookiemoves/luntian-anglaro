@@ -1,22 +1,28 @@
-import { useEffect } from 'react';
-import { useGameStore } from '@/store';
+/**
+ * 💀 LUNTIAN ANGLARO — Generals of Pollution Page
+ * Lists all 6 Generals with threat info, weakness, and clickable cards.
+ */
+import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useGameStore } from '@/store'
 
 const THREAT_CONFIG: Record<string, { emoji: string; color: string }> = {
-  AIR: { emoji: '💨', color: '#78909C' },
-  WATER: { emoji: '🏭', color: '#5C6BC0' },
-  MINING: { emoji: '⛏️', color: '#8D6E63' },
-  FOREST: { emoji: '🪓', color: '#66BB6A' },
-  OCEAN: { emoji: '🌊', color: '#26C6DA' },
+  AIR:     { emoji: '💨', color: '#78909C' },
+  WATER:   { emoji: '🏭', color: '#5C6BC0' },
+  MINING:  { emoji: '⛏️', color: '#8D6E63' },
+  FOREST:  { emoji: '🪓', color: '#66BB6A' },
+  OCEAN:   { emoji: '🌊', color: '#26C6DA' },
   CORRUPT: { emoji: '🏛️', color: '#FFA726' },
-  FINAL: { emoji: '☠️', color: '#EF5350' },
-};
+  FINAL:   { emoji: '☠️', color: '#EF5350' },
+}
 
 const GeneralsPage = () => {
-  const { generals, guardians, initialize, isInitialized, language } = useGameStore();
+  const { generals, guardians, initialize, isInitialized, language } = useGameStore()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    if (!isInitialized) initialize();
-  }, [initialize, isInitialized]);
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
 
   return (
     <div className="p-6">
@@ -31,12 +37,13 @@ const GeneralsPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {generals.map((g) => {
-          const threat = THREAT_CONFIG[g.threat_type] || { emoji: '💀', color: '#EF5350' };
-          const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element);
+          const threat = THREAT_CONFIG[g.threat_type] || { emoji: '💀', color: '#EF5350' }
+          const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element)
 
           return (
             <div
               key={g.id}
+              onClick={() => navigate(`/generals/${g.name}`)}
               className="rounded-2xl p-6 border border-red-900/40 bg-red-950/20 hover:bg-red-950/40 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
             >
               {/* Header */}
@@ -89,11 +96,11 @@ const GeneralsPage = () => {
                 </span>
               </div>
             </div>
-          );
+          )
         })}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default GeneralsPage;
+export default GeneralsPage
