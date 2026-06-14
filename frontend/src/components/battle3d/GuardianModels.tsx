@@ -1442,7 +1442,6 @@ export function AngDumiModel({ animPhase, hp, role, baseX }: ModelProps) {
    LOOKUP — Maps guardian/general name → model
    Checks for .glb first, falls back to procedural
    ═══════════════════════════════════════════════ */
-import { hasGLBModel, GLBModel } from './GLBModelLoader'
 
 export function GuardianModelLookup({ name, ...props }: ModelProps & { name: string }) {
   if (hasGLBModel(name)) {
