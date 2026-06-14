@@ -395,7 +395,7 @@ export default function ChapterReaderPage() {
                 <span className="text-red-400">{scene.battleConfig.general.charAt(0).toUpperCase() + scene.battleConfig.general.slice(1)}</span>
               </p>
               <div className="flex gap-3 justify-center mt-6">
-                onClick={(e) => { e.stopPropagation(); navigate(`/battle?mode=story&guardian=${scene.battleConfig.guardian}&general=${scene.battleConfig.general}&chapter=${chapter.id}&scene=${sceneIdx}`) }}
+                <button onClick={(e) => { e.stopPropagation(); navigate(`/battle?mode=story&guardian=${scene.battleConfig!.guardian}&general=${scene.battleConfig!.general}&chapter=${chapter.id}&scene=${sceneIdx}`) }}
                   className="px-8 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all hover:scale-105 text-lg">
                   ⚔️ {isFil ? 'Lumaban!' : 'Fight!'}
                 </button>
