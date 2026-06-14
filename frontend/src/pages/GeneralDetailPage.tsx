@@ -7,7 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { Suspense } from 'react'
-import { useGameStore } from '@/stores/gameStore'
+import { useGameStore } from '@/store'
 import { ELEMENT_CONFIG } from '@/types/game.types'
 import { GeneralModelLookup } from '@/components/battle3d/GuardianModels'
 
@@ -208,73 +208,99 @@ export default function GeneralDetailPage() {
 
       {/* ═══ HEADER ═══ */}
       <div className="flex items-start gap-6">
-        {/* 3D Model Preview */}
-        <div className="w-48 h-48 rounded-2xl overflow-hidden border border-red-900/30 bg-[#0a0505] flex-shrink-0">
-          <Canvas camera={{ position: [0, 2, 5], fov: 35 }} gl={{ antialias: true }}>
-            <Suspense fallback={null}>
-              <ambientLight intensity={0.4} />
-              <directionalLight position={[3, 5, 2]} intensity={1} />
-              <pointLight position={[0, 2, 2]} intensity={0.8} color={threatColor} />
-              <fog attach="fog" args={['#0a0505', 5, 15]} />
-              <GeneralModelLookup
-                name={general.name}
-                animPhase="idle"
-                hp={100}
-                role="general"
-                baseX={0}
+        {/* ═══ 3D MODEL SHOWCASE — Center Stage ═══ */}
+      <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-red-900/30 bg-[#0a0505] mb-6">
+        <Canvas camera={{ position: [0, 2, 5], fov: 35 }} gl={{ antialias: true }}>
+          <Suspense fallback={null}>
+            <ambientLight intensity={0.4} />
+            <directionalLight position={[3, 5, 2]} intensity={1} />
+            <pointLight position={[-2, 3, 2]} intensity={0.6} color={threatColor} />
+            <pointLight position={[2, 1, -2]} intensity={0.4} color={threatColor} />
+            <fog attach="fog" args={['#0a0505', 6, 18]} />
+
+            {/* Arena floor for grounding */}
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+              <circleGeometry args={[2.5, 48]} />
+              <meshStandardMaterial color="#0d0505" metalness={0.1} roughness={0.9} />
+            </mesh>
+            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]}>
+              <ringGeometry args={[2.3, 2.5, 48]} />
+              <meshStandardMaterial
+                color={threatColor}
+                emissive={threatColor}
+                emissiveIntensity={0.6}
+                transparent
+                opacity={0.4}
               />
-              <OrbitControls
-                enablePan={false}
-                autoRotate
-                autoRotateSpeed={1.5}
-                enableZoom={false}
-                minPolarAngle={Math.PI / 4}
-                maxPolarAngle={Math.PI / 2}
-              />
-            </Suspense>
-          </Canvas>
-        </div>
+            </mesh>
 
-        {/* Name & Title */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <span className="text-3xl">{general.emoji}</span>
-            <h1 className="text-3xl font-black" style={{ color: threatColor }}>
-              {general.display_name}
-            </h1>
-          </div>
-          <p className="text-sm mb-2" style={{ color: threatColor + 'aa' }}>
-            {general.threat_display}
-          </p>
-          <p className="text-lg font-semibold text-[var(--luntian-text-muted)] italic">
-            {lore ? (isFil ? lore.title_fil : lore.title_en) : ''}
-          </p>
-          <p className="text-xs text-[var(--luntian-text-muted)]/60 mt-1">
-            {lore ? (isFil ? lore.origin_fil : lore.origin_en) : ''}
-          </p>
+            <GeneralModelLookup
+              name={general.name}
+              animPhase="idle"
+              hp={100}
+              role="general"
+              baseX={0}
+            />
+            <OrbitControls
+              enablePan={false}
+              autoRotate
+              autoRotateSpeed={1.2}
+              enableZoom={false}
+              minPolarAngle={Math.PI / 5}
+              maxPolarAngle={Math.PI / 2.2}
+            />
+          </Suspense>
+        </Canvas>
 
-          {/* Threat Level Badge */}
-          {lore && (
-            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full border"
-              style={{
-                borderColor: threatColor + '40',
-                backgroundColor: threatColor + '15',
-              }}
-            >
-              <span className="text-xs font-bold" style={{ color: threatColor }}>
-                ⚠️ THREAT LEVEL: {lore.threat_level}
-              </span>
-            </div>
-          )}
+        {/* Overlay gradient at bottom for text readability */}
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--luntian-bg)] to-transparent pointer-events-none" />
 
-          {general.name === 'ang_dumi' && (
-            <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-900/20 border border-red-900/40 ml-2">
-              <span className="text-xs font-bold text-red-400">👑 FINAL BOSS</span>
-            </div>
-          )}
+        {/* Drag hint */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-[var(--luntian-text-muted)]/40 pointer-events-none">
+          🖱️ Drag to rotate • Auto-spinning 360°
         </div>
       </div>
 
+      {/* ═══ NAME & TITLE — Below the model ═══ */}
+      <div className="text-center mb-6">
+        <div className="flex items-center justify-center gap-3 mb-1">
+          <span className="text-4xl">{general.emoji}</span>
+          <h1 className="text-4xl font-black" style={{ color: threatColor }}>
+            {general.display_name}
+          </h1>
+        </div>
+        <p className="text-sm mb-1" style={{ color: threatColor + 'aa' }}>
+          {general.threat_display}
+        </p>
+        <p className="text-lg font-semibold text-[var(--luntian-text-muted)] italic">
+          {lore ? (isFil ? lore.title_fil : lore.title_en) : ''}
+        </p>
+        <p className="text-xs text-[var(--luntian-text-muted)]/60 mt-1">
+          {lore ? (isFil ? lore.origin_fil : lore.origin_en) : ''}
+        </p>
+
+        {/* Badges */}
+        <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
+          {lore && (
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold"
+              style={{
+                borderColor: threatColor + '40',
+                backgroundColor: threatColor + '15',
+                color: threatColor,
+              }}
+            >
+              ⚠️ THREAT LEVEL: {lore.threat_level}
+            </span>
+          )}
+          {general.name === 'ang_dumi' && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-900/20 border border-red-900/40 text-xs font-bold text-red-400">
+              👑 FINAL BOSS
+            </span>
+          )}
+        </div>
+      </div>
+      
       {/* ═══ STATS GRID ═══ */}
       <div className="grid grid-cols-4 gap-3">
         <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
