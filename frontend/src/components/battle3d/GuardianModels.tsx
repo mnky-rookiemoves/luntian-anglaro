@@ -1437,6 +1437,21 @@ export function AngDumiModel({ animPhase, hp, role, baseX }: ModelProps) {
     </group>
   )
 }
+/* ═══════════════════════════════════════════════
+   LOOKUP — Maps guardian/general name → model
+   ═══════════════════════════════════════════════ */
+export function GuardianModelLookup({ name, ...props }: ModelProps & { name: string }) {
+  switch (name) {
+    case 'luntian':  return <LuntianModel {...props} />
+    case 'alon':     return <AlonModel {...props} />
+    case 'bulkan':   return <BulkanModel {...props} />
+    case 'haribon':  return <HaribonModel {...props} />
+    case 'pawikan':  return <PawikanModel {...props} />
+    default:         return <LuntianModel {...props} />
+  }
+}
+
+  // ... keep what's already there
 
 /* ═══════════════════════════════════════════════
    LOOKUP — Maps general name → model
