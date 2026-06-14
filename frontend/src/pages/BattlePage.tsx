@@ -6,9 +6,10 @@
 import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store';
 import { ELEMENT_CONFIG } from '@/types/game.types';
-import BattleEngine from '@/components/battle/BattleEngine';
+/**import BattleEngine from '@/components/battle/BattleEngine';*/
 import type { Guardian, General } from '@/types/game.types';
 import { toast } from 'sonner';
+import Battle3DArena from '@/components/battle3d/Battle3DArena';
 
 const BattlePage = () => {
   const { guardians, generals, initialize, isInitialized, language } = useGameStore();
@@ -50,11 +51,11 @@ const BattlePage = () => {
     setSelectedGeneral(null);
   };
 
-  // Battle mode
+  // ── 3D Battle Mode ──
   if (inBattle && selectedGuardian && selectedGeneral) {
     return (
       <div className="p-6">
-        <BattleEngine
+        <Battle3DArena
           guardian={selectedGuardian}
           general={selectedGeneral}
           language={language}
