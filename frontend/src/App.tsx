@@ -11,6 +11,8 @@ import CodexPage from '@/pages/CodexPage';
 import CreatePlayerPage from '@/pages/CreatePlayerPage';
 import ProfilePage from '@/pages/ProfilePage';
 import MapPage from '@/pages/MapPage';
+import GuardianDetailPage from '@/pages/GuardianDetailPage';
+import BattlePage from '@/pages/BattlePage';
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/guardians" element={<GuardiansPage />} />
+          <Route path="/guardians/:id" element={<GuardianDetailPage />} />
           <Route path="/generals" element={<GeneralsPage />} />
           <Route path="/regions" element={<RegionsPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
@@ -27,6 +30,7 @@ function App() {
           <Route path="/create-player" element={<CreatePlayerPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/map" element={<MapPage />} />
+          <Route path="/battle" element={<BattlePage />} />
         </Route>
       </Routes>
       <Toaster

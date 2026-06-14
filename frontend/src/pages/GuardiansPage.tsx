@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '@/store';
 import { ELEMENT_CONFIG } from '@/types/game.types';
 
 const GuardiansPage = () => {
   const { guardians, initialize, isInitialized, language } = useGameStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isInitialized) initialize();
@@ -26,6 +28,7 @@ const GuardiansPage = () => {
           return (
             <div
               key={g.id}
+              onClick={() => navigate(`/guardians/${g.id}`)}
               className="rounded-2xl p-6 border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
               style={{
                 backgroundColor: `${config.bgColor}33`,
