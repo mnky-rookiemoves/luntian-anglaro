@@ -1,0 +1,28 @@
+{
+  "name": "LUNTIAN: Guardians of the Environment",
+  "short_name": "Luntian",
+  "description": "An environmental action RPG — protect the Philippine archipelago!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a1a0a",
+  "theme_color": "#2E7D32",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

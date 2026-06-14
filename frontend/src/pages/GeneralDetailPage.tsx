@@ -206,10 +206,11 @@ export default function GeneralDetailPage() {
       </div>
 
       {/* ═══ MAIN SPLIT LAYOUT ═══ */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
 
         {/* ── LEFT COLUMN: Details ── */}
-        <div className="w-1/2 overflow-y-auto px-6 pb-6 space-y-4">
+        {/* LEFT COLUMN */}
+        <div className="w-full lg:w-1/2 overflow-y-auto px-6 pb-6 space-y-4">
 
           {/* Name & Title */}
           <div>
@@ -376,7 +377,8 @@ export default function GeneralDetailPage() {
         </div>
 
         {/* ── RIGHT COLUMN: 3D Model Portrait ── */}
-        <div className="w-1/2 relative border-l border-red-900/15">
+        {/* RIGHT COLUMN */}
+        <div className="w-full lg:w-1/2 h-[300px] lg:h-auto relative border-t lg:border-t-0 lg:border-l border-red-900/15">
           <Canvas
             camera={{ position: [0, 1.2, 4], fov: 65 }}
             gl={{ antialias: true }}
