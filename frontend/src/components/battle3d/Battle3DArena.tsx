@@ -466,13 +466,15 @@ export default function Battle3DArena({
           <Suspense fallback={null}>
             <fog attach="fog" args={['#050a05', 8, 20]} />
             <SceneContent
-              guardianElement={guardian.element}
-              animPhase={animPhase}
-              guardianHP={guardianHP}
-              generalHP={generalHP}
-              damageEvents={damageEvents}
-              removeDamageEvent={removeDamageEvent}
-            />
+                guardianElement={guardian.element}
+                guardianName={guardian.name}
+                generalName={general.name}
+                animPhase={animPhase}
+                guardianHP={guardianHP}
+                generalHP={generalHP}
+                damageEvents={damageEvents}
+                removeDamageEvent={removeDamageEvent}
+                />
           </Suspense>
         </Canvas>
 
