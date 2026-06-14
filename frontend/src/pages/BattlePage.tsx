@@ -85,7 +85,7 @@ const BattlePage = () => {
             🛡️ {language === 'en' ? 'Select Guardian' : 'Pumili ng Tagapag-alaga'}
           </h2>
           <div className="space-y-3">
-            {(guardians || []).map((g) => {
+            {(Array.isArray(guardians) ? guardians : []).map((g) => {
               const c = ELEMENT_CONFIG[g.element];
               const isSelected = selectedGuardian?.id === g.id;
               return (
@@ -125,7 +125,7 @@ const BattlePage = () => {
             💀 {language === 'en' ? 'Select General' : 'Pumili ng Heneral'}
           </h2>
           <div className="space-y-3">
-            {(generals || []).map((g) => {
+            {(Array.isArray(generals) ? generals : []).map((g) => {
               const isSelected = selectedGeneral?.id === g.id;
               const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element);
               return (

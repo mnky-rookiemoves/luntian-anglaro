@@ -59,7 +59,7 @@ const GeneralsPage = () => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {(generals || []).map((g) => {
+        {(Array.isArray(generals) ? generals : []).map((g) => {
           const threat = THREAT_CONFIG[g.threat_type] || { emoji: '💀', color: '#EF5350' }
           const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element)
 

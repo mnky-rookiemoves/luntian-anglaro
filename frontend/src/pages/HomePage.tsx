@@ -129,7 +129,7 @@ const HomePage = () => {
               🛡️ {language === 'en' ? 'THE GUARDIANS' : 'ANG MGA TAGAPAG-ALAGA'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-10">
-              {(guardians || []).map((g) => {
+              {(Array.isArray(guardians) ? guardians : []).map((g) => {
                 const config = ELEMENT_CONFIG[g.element];
                 return (
                   <div
@@ -160,7 +160,7 @@ const HomePage = () => {
               💀 {language === 'en' ? 'THE GENERALS OF POLLUTION' : 'ANG MGA HENERAL NG POLUSYON'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-10">
-              {(generals || []).map((g) => (
+              {(Array.isArray(generals) ? generals : []).map((g) => (
                 <div
                   key={g.id}
                   className="rounded-xl p-3 border border-red-900/40 bg-red-950/20 hover:bg-red-950/40 transition-all duration-300 hover:scale-105 cursor-pointer"
@@ -183,7 +183,7 @@ const HomePage = () => {
               🗺️ {language === 'en' ? 'REGIONS' : 'MGA REHIYON'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-10">
-              {(regions || []).map((r) => (
+              {(Array.isArray(regions) ? regions : []).map((r) => (
                 <div
                   key={r.id}
                   className="rounded-xl p-3 border border-[var(--luntian-primary)]/30 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/10 transition-all duration-300 hover:scale-105 cursor-pointer"

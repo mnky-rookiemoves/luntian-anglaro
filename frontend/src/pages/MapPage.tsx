@@ -48,7 +48,7 @@ const MapPage = () => {
 
           {/* Quick region list (below map) */}
           <div className="mt-6 grid grid-cols-3 gap-2">
-            {(regions || []).map((r) => (
+            {(Array.isArray(regions) ? regions : []).map((r) => (
               <button
                 key={r.id}
                 onClick={() => handleRegionClick(r)}

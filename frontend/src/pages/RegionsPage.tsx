@@ -20,7 +20,7 @@ const RegionsPage = () => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {(regions || []).map((r) => (
+        {(Array.isArray(regions) ? regions : []).map((r) => (
           <div
             key={r.id}
             className="rounded-2xl p-6 border border-[var(--luntian-primary)]/30 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/5 transition-all duration-300 hover:scale-[1.01] cursor-pointer"
