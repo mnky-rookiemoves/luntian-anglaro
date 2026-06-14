@@ -837,120 +837,618 @@ export function PawikanModel({ animPhase, hp, role, baseX }: ModelProps) {
 
 /* ═══════════════════════════════════════════════
    💀 GENERAL MODELS — Villains of Pollution
+   All 6 Generals with unique procedural models
    ═══════════════════════════════════════════════ */
 
-/* Usok — Smoke General */
+/* ═══ 💨 USOK — The Smoke General ═══
+   Massive dark smoke humanoid with billowing body,
+   glowing red eyes, smokestack spines, claw hands */
 export function UsokModel({ animPhase, hp, role, baseX }: ModelProps) {
   const group = useRef<THREE.Group>(null!)
-  const prevPhase = useRef(animPhase)
+  const smokeRef = useRef<THREE.Group>(null!)
 
   useFrame((state, delta) => {
     if (!group.current) return
     const t = state.clock.elapsedTime
-    group.current.position.y = 1.0 + Math.sin(t * 1.8) * 0.1
-    group.current.rotation.y += delta * -0.5
+    group.current.position.y = 0.9 + Math.sin(t * 1.5) * 0.08
+    group.current.rotation.y += delta * -0.3
 
-    const isAttacking = (role === 'general' && animPhase === 'enemy_attacking') || (role === 'guardian' && animPhase === 'player_attacking')
-    const tx = isAttacking ? baseX + (role === 'general' ? -1.5 : 1.5) : baseX
+    // Smoke body billow
+    if (smokeRef.current) {
+      smokeRef.current.children.forEach((child, i) => {
+        child.position.y += Math.sin(t * 2 + i) * 0.002
+        child.scale.setScalar(1 + Math.sin(t * 1.5 + i * 0.7) * 0.08)
+      })
+    }
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
     group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.12)
     group.current.visible = hp > 0
-    prevPhase.current = animPhase
   })
 
   return (
-    <group ref={group} position={[baseX, 1, 0]}>
-      {/* Smoke cloud body */}
-      {[[0, 0, 0], [0.15, 0.12, 0.08], [-0.12, 0.15, -0.06], [0.08, -0.1, 0.1], [-0.1, -0.08, -0.08]].map((p, i) => (
-        <mesh key={i} position={p as [number, number, number]} scale={0.8 + Math.random() * 0.4}>
-          <sphereGeometry args={[0.25, 8, 8]} />
-          <meshStandardMaterial color="#37474F" emissive="#263238" emissiveIntensity={0.3} transparent opacity={0.65} />
+    <group ref={group} position={[baseX, 0.9, 0]} scale={0.85}>
+      {/* Torso — layered smoke clouds */}
+      <group ref={smokeRef}>
+        <mesh position={[0, 0.3, 0]} scale={[1.1, 1.3, 0.9]}>
+          <dodecahedronGeometry args={[0.35, 1]} />
+          <meshStandardMaterial color="#263238" emissive="#37474F" emissiveIntensity={0.3} flatShading transparent opacity={0.7} />
+        </mesh>
+        <mesh position={[0.12, 0.5, 0.08]} scale={0.9}>
+          <dodecahedronGeometry args={[0.25, 1]} />
+          <meshStandardMaterial color="#37474F" transparent opacity={0.5} flatShading />
+        </mesh>
+        <mesh position={[-0.1, 0.15, -0.05]} scale={0.85}>
+          <dodecahedronGeometry args={[0.28, 1]} />
+          <meshStandardMaterial color="#455A64" transparent opacity={0.55} flatShading />
+        </mesh>
+      </group>
+
+      {/* Head */}
+      <mesh position={[0, 0.75, 0.05]}>
+        <dodecahedronGeometry args={[0.2, 1]} />
+        <meshStandardMaterial color="#1a1a1a" emissive="#263238" emissiveIntensity={0.4} flatShading />
+      </mesh>
+
+      {/* Angry red eyes — narrow slits */}
+      <mesh position={[-0.08, 0.78, 0.18]} scale={[1.8, 0.5, 1]}>
+        <sphereGeometry args={[0.025, 8, 8]} />
+        <meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={6} />
+      </mesh>
+      <mesh position={[0.08, 0.78, 0.18]} scale={[1.8, 0.5, 1]}>
+        <sphereGeometry args={[0.025, 8, 8]} />
+        <meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={6} />
+      </mesh>
+
+      {/* Smokestack spines on back */}
+      {[[-0.08, 0.85, -0.12], [0.08, 0.9, -0.1], [0, 0.95, -0.14]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]} rotation={[-0.3, 0, (i - 1) * 0.1]}>
+          <cylinderGeometry args={[0.03, 0.04, 0.2, 6]} />
+          <meshStandardMaterial color="#212121" emissive="#424242" emissiveIntensity={0.5} />
         </mesh>
       ))}
-      {/* Red glowing eyes */}
-      <mesh position={[-0.1, 0.08, 0.22]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
-      <mesh position={[0.1, 0.08, 0.22]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
-      {/* Wispy tendrils */}
+
+      {/* Massive arms */}
+      <group position={[-0.45, 0.35, 0]} rotation={[0, 0, 0.4]}>
+        <mesh><cylinderGeometry args={[0.1, 0.08, 0.5, 6]} /><meshStandardMaterial color="#37474F" flatShading transparent opacity={0.65} /></mesh>
+        <mesh position={[0, -0.35, 0]}><dodecahedronGeometry args={[0.12, 0]} /><meshStandardMaterial color="#263238" flatShading /></mesh>
+        {/* Claw fingers */}
+        {[-0.05, 0, 0.05].map((x, i) => (
+          <mesh key={i} position={[x, -0.48, 0.02]} rotation={[0.4, 0, 0]}>
+            <coneGeometry args={[0.015, 0.1, 4]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        ))}
+      </group>
+      <group position={[0.45, 0.35, 0]} rotation={[0, 0, -0.4]}>
+        <mesh><cylinderGeometry args={[0.1, 0.08, 0.5, 6]} /><meshStandardMaterial color="#37474F" flatShading transparent opacity={0.65} /></mesh>
+        <mesh position={[0, -0.35, 0]}><dodecahedronGeometry args={[0.12, 0]} /><meshStandardMaterial color="#263238" flatShading /></mesh>
+        {[-0.05, 0, 0.05].map((x, i) => (
+          <mesh key={i} position={[x, -0.48, 0.02]} rotation={[0.4, 0, 0]}>
+            <coneGeometry args={[0.015, 0.1, 4]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Smoke wisp tendrils at base */}
       {[0, 72, 144, 216, 288].map((a, i) => (
-        <mesh key={`t${i}`} position={[Math.cos(a * Math.PI / 180) * 0.2, -0.3, Math.sin(a * Math.PI / 180) * 0.2]} rotation={[0.3, 0, (i - 2) * 0.15]}>
-          <cylinderGeometry args={[0.03, 0.01, 0.4, 5]} />
-          <meshStandardMaterial color="#455A64" transparent opacity={0.4} />
+        <mesh key={i} position={[Math.cos(a * Math.PI / 180) * 0.25, -0.2, Math.sin(a * Math.PI / 180) * 0.25]} rotation={[0.3, 0, (i - 2) * 0.12]}>
+          <cylinderGeometry args={[0.04, 0.01, 0.45, 5]} />
+          <meshStandardMaterial color="#455A64" transparent opacity={0.3} />
         </mesh>
       ))}
+
       <pointLight color="#FF1744" intensity={0.8} distance={3} />
     </group>
   )
 }
 
-/* Mantsa — Toxic Water Sludge */
-export function MantsaModel(props: ModelProps) {
+/* ═══ 🏭 MANTSA — The Stain General ═══
+   Toxic humanoid with iridescent oil-slick body,
+   corrupted staff, dripping sludge, dead fish aura */
+export function MantsaModel({ animPhase, hp, role, baseX }: ModelProps) {
   const group = useRef<THREE.Group>(null!)
-  useFrame((state) => {
+  const dripRef = useRef<THREE.Group>(null!)
+
+  useFrame((state, delta) => {
     if (!group.current) return
     const t = state.clock.elapsedTime
-    group.current.position.y = 0.8 + Math.sin(t * 1.5) * 0.08
-    group.current.rotation.y += 0.003
-    const isAttacking = (props.role === 'general' && props.animPhase === 'enemy_attacking')
-    const tx = isAttacking ? props.baseX - 1.5 : props.baseX
+    group.current.position.y = 0.85 + Math.sin(t * 1.2) * 0.06
+    group.current.rotation.y = Math.sin(t * 0.4) * 0.1
+
+    // Drip animation
+    if (dripRef.current) {
+      dripRef.current.children.forEach((child, i) => {
+        child.position.y = -0.3 - ((t * 0.5 + i * 0.3) % 0.8)
+        const scale = 1 - ((t * 0.5 + i * 0.3) % 0.8)
+        child.scale.setScalar(Math.max(0.1, scale * 0.5))
+      })
+    }
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
     group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.12)
-    group.current.visible = props.hp > 0
+    group.current.visible = hp > 0
   })
+
   return (
-    <group ref={group} position={[props.baseX, 0.8, 0]}>
-      <mesh scale={[1.2, 0.8, 1]}><sphereGeometry args={[0.4, 8, 8]} /><meshStandardMaterial color="#33691E" emissive="#1B5E20" emissiveIntensity={0.4} flatShading /></mesh>
-      <mesh position={[0, 0.2, 0]} scale={[0.8, 0.5, 0.8]}><sphereGeometry args={[0.3, 8, 8]} /><meshStandardMaterial color="#2E7D32" emissive="#1B5E20" emissiveIntensity={0.3} flatShading transparent opacity={0.8} /></mesh>
-      {/* Toxic bubbles */}
-      {[[0.2, 0.35, 0.1], [-0.15, 0.4, -0.08], [0.05, 0.45, 0.15]].map((p, i) => (
-        <mesh key={i} position={p as [number, number, number]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={3} transparent opacity={0.6} /></mesh>
+    <group ref={group} position={[baseX, 0.85, 0]} scale={0.85}>
+      {/* Head with spine crown */}
+      <mesh position={[0, 0.75, 0]}>
+        <dodecahedronGeometry args={[0.18, 0]} />
+        <meshStandardMaterial color="#1B0A2E" emissive="#4A148C" emissiveIntensity={0.4} flatShading />
+      </mesh>
+      {/* Crown spines */}
+      {[-0.1, -0.03, 0.03, 0.1].map((x, i) => (
+        <mesh key={i} position={[x, 0.93, -0.02]} rotation={[0.1, 0, (i - 1.5) * 0.12]}>
+          <coneGeometry args={[0.015, 0.12, 4]} />
+          <meshStandardMaterial color="#4A148C" emissive="#7B1FA2" emissiveIntensity={1} />
+        </mesh>
       ))}
-      <mesh position={[-0.1, 0.15, 0.3]}><sphereGeometry args={[0.035, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={4} /></mesh>
-      <mesh position={[0.1, 0.15, 0.3]}><sphereGeometry args={[0.035, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={4} /></mesh>
-      <pointLight color="#76FF03" intensity={0.6} distance={3} />
+      {/* Red eyes */}
+      <mesh position={[-0.06, 0.78, 0.15]}><sphereGeometry args={[0.025, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
+      <mesh position={[0.06, 0.78, 0.15]}><sphereGeometry args={[0.025, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
+
+      {/* Torso — iridescent toxic body */}
+      <mesh position={[0, 0.35, 0]} scale={[0.9, 1.4, 0.65]}>
+        <dodecahedronGeometry args={[0.3, 0]} />
+        <meshStandardMaterial color="#1A237E" emissive="#311B92" emissiveIntensity={0.3} flatShading metalness={0.6} roughness={0.3} />
+      </mesh>
+      {/* Toxic vein patches */}
+      {[[-0.1, 0.4, 0.22], [0.12, 0.3, 0.2], [-0.05, 0.2, 0.22], [0.08, 0.45, 0.18]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]}>
+          <sphereGeometry args={[0.03, 6, 6]} />
+          <meshStandardMaterial color={['#E91E63', '#00E676', '#FF6D00', '#00BCD4'][i]} emissive={['#C2185B', '#00C853', '#E65100', '#0097A7'][i]} emissiveIntensity={2} />
+        </mesh>
+      ))}
+
+      {/* Arms */}
+      <group position={[-0.38, 0.4, 0]} rotation={[0, 0, 0.3]}>
+        <mesh><cylinderGeometry args={[0.07, 0.06, 0.45, 6]} /><meshStandardMaterial color="#1A237E" flatShading metalness={0.5} /></mesh>
+        <mesh position={[0, -0.3, 0]}><cylinderGeometry args={[0.06, 0.05, 0.3, 6]} /><meshStandardMaterial color="#0D47A1" flatShading /></mesh>
+      </group>
+      <group position={[0.38, 0.4, 0]} rotation={[0, 0, -0.3]}>
+        <mesh><cylinderGeometry args={[0.07, 0.06, 0.45, 6]} /><meshStandardMaterial color="#1A237E" flatShading metalness={0.5} /></mesh>
+        <mesh position={[0, -0.3, 0]}><cylinderGeometry args={[0.06, 0.05, 0.3, 6]} /><meshStandardMaterial color="#0D47A1" flatShading /></mesh>
+      </group>
+
+      {/* Staff */}
+      <group position={[-0.5, 0.1, 0.1]} rotation={[0, 0, 0.15]}>
+        <mesh><cylinderGeometry args={[0.02, 0.025, 1.1, 6]} /><meshStandardMaterial color="#3E2723" /></mesh>
+        <mesh position={[0, 0.6, 0]}><dodecahedronGeometry args={[0.06, 0]} /><meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={3} /></mesh>
+      </group>
+
+      {/* Legs dissolving into sludge */}
+      <mesh position={[-0.12, -0.1, 0]}><cylinderGeometry args={[0.08, 0.12, 0.4, 6]} /><meshStandardMaterial color="#0D47A1" flatShading transparent opacity={0.7} /></mesh>
+      <mesh position={[0.12, -0.1, 0]}><cylinderGeometry args={[0.08, 0.12, 0.4, 6]} /><meshStandardMaterial color="#0D47A1" flatShading transparent opacity={0.7} /></mesh>
+
+      {/* Dripping sludge */}
+      <group ref={dripRef}>
+        {[0, 1, 2, 3].map((i) => (
+          <mesh key={i} position={[(i - 1.5) * 0.12, -0.3, 0.1]}>
+            <sphereGeometry args={[0.025, 6, 6]} />
+            <meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={2} transparent opacity={0.6} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Toxic pool at base */}
+      <mesh position={[0, -0.35, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.4, 16]} />
+        <meshStandardMaterial color="#1B5E20" emissive="#00E676" emissiveIntensity={0.5} transparent opacity={0.3} />
+      </mesh>
+
+      <pointLight color="#7B1FA2" intensity={0.7} distance={3} />
     </group>
   )
 }
 
-/* Generic General fallback (Hukay, Putol, Lason, Ang Dumi) */
-export function GenericGeneralModel(props: ModelProps) {
+/* ═══ ⛏️ HUKAY — The Pit General ═══
+   Massive rock/earth golem born from illegal mining,
+   lava cracks, rebar/metal spikes, crushing claw hands */
+export function HukayModel({ animPhase, hp, role, baseX }: ModelProps) {
   const group = useRef<THREE.Group>(null!)
-  useFrame((state) => {
+
+  useFrame((state, delta) => {
     if (!group.current) return
     const t = state.clock.elapsedTime
-    group.current.position.y = 1.0 + Math.sin(t * 1.5) * 0.1
-    group.current.rotation.y += 0.005
-    const isAttacking = props.animPhase === 'enemy_attacking'
-    const tx = isAttacking ? props.baseX - 1.5 : props.baseX
-    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.12)
-    group.current.visible = props.hp > 0
+    group.current.position.y = 0.75 + Math.abs(Math.sin(t * 1)) * 0.04
+    group.current.rotation.y = Math.sin(t * 0.3) * 0.06
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.1)
+    group.current.visible = hp > 0
   })
+
   return (
-    <group ref={group} position={[props.baseX, 1, 0]}>
-      <mesh><octahedronGeometry args={[0.5, 1]} /><meshStandardMaterial color="#8B0000" emissive="#B71C1C" emissiveIntensity={0.5} flatShading /></mesh>
-      <mesh scale={1.05}><octahedronGeometry args={[0.5, 1]} /><meshStandardMaterial color="#FF3D00" emissive="#DD2C00" emissiveIntensity={1} wireframe /></mesh>
-      <mesh position={[-0.1, 0.1, 0.4]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
-      <mesh position={[0.1, 0.1, 0.4]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
-      <pointLight color="#FF3D00" intensity={0.8} distance={3} />
+    <group ref={group} position={[baseX, 0.75, 0]} scale={0.9}>
+      {/* Head — jagged rock */}
+      <mesh position={[0, 0.8, 0]}>
+        <dodecahedronGeometry args={[0.2, 0]} />
+        <meshStandardMaterial color="#424242" emissive="#212121" emissiveIntensity={0.2} flatShading />
+      </mesh>
+      {/* Orange lava eyes */}
+      <mesh position={[-0.08, 0.83, 0.16]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#FF6D00" emissive="#E65100" emissiveIntensity={5} /></mesh>
+      <mesh position={[0.08, 0.83, 0.16]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#FF6D00" emissive="#E65100" emissiveIntensity={5} /></mesh>
+      {/* Jagged teeth */}
+      <mesh position={[0, 0.75, 0.18]} rotation={[0.5, 0, 0]}><coneGeometry args={[0.06, 0.05, 5]} /><meshStandardMaterial color="#616161" flatShading /></mesh>
+
+      {/* Massive torso */}
+      <mesh position={[0, 0.35, 0]} scale={[1.3, 1.4, 1]}>
+        <dodecahedronGeometry args={[0.35, 0]} />
+        <meshStandardMaterial color="#424242" emissive="#212121" emissiveIntensity={0.15} flatShading />
+      </mesh>
+      {/* Lava crack wireframe */}
+      <mesh position={[0, 0.35, 0]} scale={[1.32, 1.42, 1.02]}>
+        <dodecahedronGeometry args={[0.35, 0]} />
+        <meshStandardMaterial color="#FF6D00" emissive="#E65100" emissiveIntensity={1.8} wireframe />
+      </mesh>
+
+      {/* Rebar spikes protruding from body */}
+      {[[0.3, 0.5, 0.15], [-0.25, 0.55, -0.1], [0.15, 0.6, -0.2], [-0.1, 0.25, 0.3]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]} rotation={[Math.random(), Math.random(), Math.random()]}>
+          <cylinderGeometry args={[0.015, 0.01, 0.2, 4]} />
+          <meshStandardMaterial color="#795548" emissive="#4E342E" emissiveIntensity={0.3} />
+        </mesh>
+      ))}
+
+      {/* Massive crushing arms */}
+      <group position={[-0.55, 0.4, 0]} rotation={[0, 0, 0.35]}>
+        <mesh><cylinderGeometry args={[0.14, 0.1, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+        <mesh position={[0, -0.35, 0]}><cylinderGeometry args={[0.1, 0.15, 0.4, 6]} /><meshStandardMaterial color="#616161" flatShading /></mesh>
+        {/* Crushing claw */}
+        <mesh position={[-0.06, -0.6, 0]} rotation={[0, 0, 0.3]}><coneGeometry args={[0.04, 0.18, 4]} /><meshStandardMaterial color="#212121" /></mesh>
+        <mesh position={[0.06, -0.6, 0]} rotation={[0, 0, -0.3]}><coneGeometry args={[0.04, 0.18, 4]} /><meshStandardMaterial color="#212121" /></mesh>
+      </group>
+      <group position={[0.55, 0.4, 0]} rotation={[0, 0, -0.35]}>
+        <mesh><cylinderGeometry args={[0.14, 0.1, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+        <mesh position={[0, -0.35, 0]}><cylinderGeometry args={[0.1, 0.15, 0.4, 6]} /><meshStandardMaterial color="#616161" flatShading /></mesh>
+        <mesh position={[-0.06, -0.6, 0]} rotation={[0, 0, 0.3]}><coneGeometry args={[0.04, 0.18, 4]} /><meshStandardMaterial color="#212121" /></mesh>
+        <mesh position={[0.06, -0.6, 0]} rotation={[0, 0, -0.3]}><coneGeometry args={[0.04, 0.18, 4]} /><meshStandardMaterial color="#212121" /></mesh>
+      </group>
+
+      {/* Legs */}
+      <mesh position={[-0.2, -0.2, 0]}><cylinderGeometry args={[0.14, 0.18, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+      <mesh position={[0.2, -0.2, 0]}><cylinderGeometry args={[0.14, 0.18, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+
+      <pointLight color="#FF6D00" intensity={1} distance={3} />
+    </group>
+  )
+}
+
+/* ═══ 🪓 PUTOL — The Chainsaw General ═══
+   Corrupted dead-wood treant with chainsaw blade arms,
+   hollow stump head, sawdust particles, splintered body */
+export function PutolModel({ animPhase, hp, role, baseX }: ModelProps) {
+  const group = useRef<THREE.Group>(null!)
+  const sawRef = useRef<THREE.Group>(null!)
+
+  useFrame((state, delta) => {
+    if (!group.current) return
+    const t = state.clock.elapsedTime
+    group.current.position.y = 0.85 + Math.sin(t * 1.3) * 0.05
+    group.current.rotation.y = Math.sin(t * 0.35) * 0.08
+
+    // Chainsaw vibration
+    if (sawRef.current) {
+      sawRef.current.children.forEach((child) => {
+        child.position.y += Math.sin(t * 20) * 0.003
+      })
+    }
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.12)
+    group.current.visible = hp > 0
+  })
+
+  return (
+    <group ref={group} position={[baseX, 0.85, 0]} scale={0.85}>
+      {/* Head — hollow tree stump */}
+      <mesh position={[0, 0.7, 0]}>
+        <cylinderGeometry args={[0.18, 0.22, 0.25, 8]} />
+        <meshStandardMaterial color="#3E2723" flatShading />
+      </mesh>
+      {/* Hollow cavity */}
+      <mesh position={[0, 0.72, 0.08]}>
+        <cylinderGeometry args={[0.12, 0.14, 0.2, 8]} />
+        <meshStandardMaterial color="#1a0e08" />
+      </mesh>
+      {/* Glowing amber eyes inside cavity */}
+      <mesh position={[-0.05, 0.73, 0.14]}><sphereGeometry args={[0.025, 8, 8]} /><meshStandardMaterial color="#FFAB00" emissive="#FF8F00" emissiveIntensity={5} /></mesh>
+      <mesh position={[0.05, 0.73, 0.14]}><sphereGeometry args={[0.025, 8, 8]} /><meshStandardMaterial color="#FFAB00" emissive="#FF8F00" emissiveIntensity={5} /></mesh>
+
+      {/* Torso — splintered dead wood */}
+      <mesh position={[0, 0.3, 0]} scale={[0.9, 1.3, 0.7]}>
+        <cylinderGeometry args={[0.25, 0.3, 0.6, 7]} />
+        <meshStandardMaterial color="#4E342E" flatShading />
+      </mesh>
+      {/* Wood grain / splinter lines */}
+      <mesh position={[0, 0.3, 0]} scale={[0.92, 1.32, 0.72]}>
+        <cylinderGeometry args={[0.25, 0.3, 0.6, 7]} />
+        <meshStandardMaterial color="#6D4C41" emissive="#5D4037" emissiveIntensity={0.3} wireframe />
+      </mesh>
+
+      {/* Broken branch spikes on shoulders */}
+      {[[-0.28, 0.55, 0], [0.28, 0.55, 0], [-0.2, 0.6, -0.1], [0.22, 0.58, -0.08]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]} rotation={[0.2, 0, (i - 1.5) * 0.4]}>
+          <coneGeometry args={[0.03, 0.18, 5]} />
+          <meshStandardMaterial color="#5D4037" flatShading />
+        </mesh>
+      ))}
+
+      {/* Chainsaw arms */}
+      <group ref={sawRef}>
+        {/* Left chainsaw arm */}
+        <group position={[-0.45, 0.25, 0]} rotation={[0, 0, 0.5]}>
+          <mesh><cylinderGeometry args={[0.08, 0.06, 0.35, 6]} /><meshStandardMaterial color="#4E342E" flatShading /></mesh>
+          {/* Blade */}
+          <mesh position={[0, -0.35, 0]} scale={[0.15, 0.5, 0.04]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color="#616161" metalness={0.8} roughness={0.2} />
+          </mesh>
+          {/* Blade teeth */}
+          {[-0.15, -0.08, 0, 0.08, 0.15].map((y, i) => (
+            <mesh key={i} position={[-0.08, -0.22 + y * 1.5, 0]} rotation={[0, 0, 0.5]}>
+              <coneGeometry args={[0.01, 0.04, 3]} />
+              <meshStandardMaterial color="#FF8F00" emissive="#E65100" emissiveIntensity={1} />
+            </mesh>
+          ))}
+        </group>
+        {/* Right chainsaw arm */}
+        <group position={[0.45, 0.25, 0]} rotation={[0, 0, -0.5]}>
+          <mesh><cylinderGeometry args={[0.08, 0.06, 0.35, 6]} /><meshStandardMaterial color="#4E342E" flatShading /></mesh>
+          <mesh position={[0, -0.35, 0]} scale={[0.15, 0.5, 0.04]}>
+            <boxGeometry args={[1, 1, 1]} />
+            <meshStandardMaterial color="#616161" metalness={0.8} roughness={0.2} />
+          </mesh>
+          {[-0.15, -0.08, 0, 0.08, 0.15].map((y, i) => (
+            <mesh key={i} position={[0.08, -0.22 + y * 1.5, 0]} rotation={[0, 0, -0.5]}>
+              <coneGeometry args={[0.01, 0.04, 3]} />
+              <meshStandardMaterial color="#FF8F00" emissive="#E65100" emissiveIntensity={1} />
+            </mesh>
+          ))}
+        </group>
+      </group>
+
+      {/* Root legs */}
+      <mesh position={[-0.15, -0.15, 0.05]} rotation={[0.1, 0, 0.1]}>
+        <cylinderGeometry args={[0.1, 0.06, 0.5, 6]} />
+        <meshStandardMaterial color="#3E2723" flatShading />
+      </mesh>
+      <mesh position={[0.15, -0.15, -0.05]} rotation={[-0.1, 0, -0.1]}>
+        <cylinderGeometry args={[0.1, 0.06, 0.5, 6]} />
+        <meshStandardMaterial color="#3E2723" flatShading />
+      </mesh>
+
+      <pointLight color="#FF8F00" intensity={0.7} distance={3} />
+    </group>
+  )
+}
+
+/* ═══ 🌊 LASON — The Poison General ═══
+   Underwater trash horror — mass of garbage and debris
+   formed into a kraken-like creature with tentacles,
+   shark jaw, glowing yellow eyes, dripping poison */
+export function LasonModel({ animPhase, hp, role, baseX }: ModelProps) {
+  const group = useRef<THREE.Group>(null!)
+  const tentaclesRef = useRef<THREE.Group>(null!)
+
+  useFrame((state, delta) => {
+    if (!group.current) return
+    const t = state.clock.elapsedTime
+    group.current.position.y = 0.95 + Math.sin(t * 1.3) * 0.12
+    group.current.rotation.y = Math.sin(t * 0.4) * 0.08
+
+    // Tentacle wave
+    if (tentaclesRef.current) {
+      tentaclesRef.current.children.forEach((child, i) => {
+        child.rotation.z = Math.sin(t * 1.5 + i * 1.2) * 0.4
+        child.rotation.x = Math.cos(t * 1.2 + i * 0.8) * 0.2
+      })
+    }
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.12)
+    group.current.visible = hp > 0
+  })
+
+  return (
+    <group ref={group} position={[baseX, 0.95, 0]} scale={0.85}>
+      {/* Main body — mass of garbage */}
+      <mesh position={[0, 0.1, 0]} scale={[1.2, 0.9, 1]}>
+        <dodecahedronGeometry args={[0.35, 1]} />
+        <meshStandardMaterial color="#1a2e1a" emissive="#004D40" emissiveIntensity={0.2} flatShading />
+      </mesh>
+      {/* Debris bumps */}
+      {[[0.2, 0.25, 0.15], [-0.18, 0.2, -0.12], [0.1, 0, 0.28], [-0.15, -0.1, 0.2]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]}>
+          <dodecahedronGeometry args={[0.08, 0]} />
+          <meshStandardMaterial color={['#455A64', '#795548', '#37474F', '#4E342E'][i]} flatShading />
+        </mesh>
+      ))}
+
+      {/* Shark jaw */}
+      <mesh position={[0.15, 0.05, 0.3]} rotation={[0.2, -0.3, 0]}>
+        <coneGeometry args={[0.12, 0.15, 6]} />
+        <meshStandardMaterial color="#37474F" flatShading />
+      </mesh>
+      {/* Teeth */}
+      {[-0.04, 0, 0.04].map((x, i) => (
+        <mesh key={i} position={[0.15 + x, 0.0, 0.38]} rotation={[0.5, 0, 0]}>
+          <coneGeometry args={[0.012, 0.06, 3]} />
+          <meshStandardMaterial color="#ECEFF1" />
+        </mesh>
+      ))}
+
+      {/* Glowing yellow eyes */}
+      <mesh position={[-0.08, 0.18, 0.28]}><sphereGeometry args={[0.04, 8, 8]} /><meshStandardMaterial color="#FFD600" emissive="#FFAB00" emissiveIntensity={5} /></mesh>
+      <mesh position={[0.06, 0.15, 0.3]}><sphereGeometry args={[0.035, 8, 8]} /><meshStandardMaterial color="#FFD600" emissive="#FFAB00" emissiveIntensity={5} /></mesh>
+
+      {/* Tentacles */}
+      <group ref={tentaclesRef}>
+        {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+          <group key={i} position={[
+            Math.cos(angle * Math.PI / 180) * 0.3,
+            -0.2,
+            Math.sin(angle * Math.PI / 180) * 0.3,
+          ]}>
+            <mesh rotation={[0.4, 0, 0]}>
+              <cylinderGeometry args={[0.04, 0.015, 0.6, 6]} />
+              <meshStandardMaterial color="#263238" emissive="#004D40" emissiveIntensity={0.3} />
+            </mesh>
+            {/* Poison drip at tip */}
+            <mesh position={[0, -0.35, 0]}>
+              <sphereGeometry args={[0.02, 6, 6]} />
+              <meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={3} transparent opacity={0.7} />
+            </mesh>
+          </group>
+        ))}
+      </group>
+
+      {/* Toxic aura */}
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.5, 0.02, 8, 16]} />
+        <meshStandardMaterial color="#76FF03" emissive="#00E676" emissiveIntensity={1.5} transparent opacity={0.3} />
+      </mesh>
+
+      <pointLight color="#FFAB00" intensity={0.8} distance={3} />
+    </group>
+  )
+}
+
+/* ═══ ☠️ ANG DUMI — The Final Boss ═══
+   Colossal amalgamation of ALL pollution — smoke upper body,
+   toxic sludge torso, mining debris limbs, dead wood spine,
+   multiple mismatched eyes, dark void core, crown of waste */
+export function AngDumiModel({ animPhase, hp, role, baseX }: ModelProps) {
+  const group = useRef<THREE.Group>(null!)
+  const coreRef = useRef<THREE.Mesh>(null!)
+
+  useFrame((state, delta) => {
+    if (!group.current) return
+    const t = state.clock.elapsedTime
+    group.current.position.y = 0.9 + Math.sin(t * 0.8) * 0.06
+    group.current.rotation.y += delta * -0.15
+
+    // Dark core pulse
+    if (coreRef.current) {
+      const mat = coreRef.current.material as THREE.MeshStandardMaterial
+      mat.emissiveIntensity = 2 + Math.sin(t * 2) * 1.5
+      coreRef.current.scale.setScalar(1 + Math.sin(t * 3) * 0.1)
+    }
+
+    const isAttacking = role === 'general' && animPhase === 'enemy_attacking'
+    const tx = isAttacking ? baseX - 1.5 : baseX
+    group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, tx, 0.08)
+    group.current.visible = hp > 0
+  })
+
+  return (
+    <group ref={group} position={[baseX, 0.9, 0]} scale={1.1}>
+      {/* ── Smoke upper body ── */}
+      <mesh position={[0, 0.6, 0]} scale={[1.2, 0.8, 1]}>
+        <dodecahedronGeometry args={[0.3, 1]} />
+        <meshStandardMaterial color="#263238" emissive="#37474F" emissiveIntensity={0.3} flatShading transparent opacity={0.6} />
+      </mesh>
+
+      {/* ── Head — crown of smokestacks and waste ── */}
+      <mesh position={[0, 0.85, 0]}>
+        <dodecahedronGeometry args={[0.22, 0]} />
+        <meshStandardMaterial color="#1a1a1a" emissive="#212121" emissiveIntensity={0.3} flatShading />
+      </mesh>
+      {/* Crown — smokestacks, pipes, spikes */}
+      {[[-0.12, 1.05, 0], [0, 1.1, -0.05], [0.12, 1.03, 0], [-0.06, 1.0, 0.1], [0.08, 1.02, 0.08]].map((p, i) => (
+        <mesh key={i} position={p as [number, number, number]} rotation={[0.1 * (i - 2), 0, (i - 2) * 0.08]}>
+          <cylinderGeometry args={[0.02, 0.03, 0.15, 5]} />
+          <meshStandardMaterial color={['#424242', '#795548', '#455A64', '#616161', '#3E2723'][i]} />
+        </mesh>
+      ))}
+
+      {/* Multiple mismatched eyes */}
+      <mesh position={[-0.08, 0.88, 0.18]}><sphereGeometry args={[0.03, 8, 8]} /><meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={5} /></mesh>
+      <mesh position={[0.09, 0.86, 0.17]}><sphereGeometry args={[0.025, 8, 8]} /><meshStandardMaterial color="#FFAB00" emissive="#FF8F00" emissiveIntensity={5} /></mesh>
+      <mesh position={[0, 0.92, 0.15]}><sphereGeometry args={[0.02, 8, 8]} /><meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={4} /></mesh>
+      <mesh position={[-0.12, 0.84, 0.12]}><sphereGeometry args={[0.018, 8, 8]} /><meshStandardMaterial color="#00BCD4" emissive="#0097A7" emissiveIntensity={4} /></mesh>
+
+      {/* ── Toxic sludge torso ── */}
+      <mesh position={[0, 0.25, 0]} scale={[1.3, 1.5, 1]}>
+        <dodecahedronGeometry args={[0.35, 0]} />
+        <meshStandardMaterial color="#1B0A2E" emissive="#311B92" emissiveIntensity={0.2} flatShading />
+      </mesh>
+      {/* Multi-element crack wireframe */}
+      <mesh position={[0, 0.25, 0]} scale={[1.32, 1.52, 1.02]}>
+        <dodecahedronGeometry args={[0.35, 0]} />
+        <meshStandardMaterial color="#FF6D00" emissive="#E65100" emissiveIntensity={1.2} wireframe />
+      </mesh>
+
+      {/* ── DARK VOID CORE — pulsing center ── */}
+      <mesh ref={coreRef} position={[0, 0.3, 0.25]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshStandardMaterial color="#000000" emissive="#4A148C" emissiveIntensity={2} transparent opacity={0.9} />
+      </mesh>
+      {/* Void ring */}
+      <mesh position={[0, 0.3, 0.25]} rotation={[0, 0, Math.PI / 4]}>
+        <torusGeometry args={[0.14, 0.015, 8, 16]} />
+        <meshStandardMaterial color="#7B1FA2" emissive="#4A148C" emissiveIntensity={3} transparent opacity={0.6} />
+      </mesh>
+
+      {/* ── Mining debris arms ── */}
+      <group position={[-0.55, 0.35, 0]} rotation={[0, 0, 0.35]}>
+        <mesh><cylinderGeometry args={[0.12, 0.1, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+        <mesh position={[0, -0.35, 0]}><dodecahedronGeometry args={[0.13, 0]} /><meshStandardMaterial color="#263238" flatShading /></mesh>
+        {/* Rebar spikes */}
+        <mesh position={[0.08, -0.15, 0]} rotation={[0, 0, -0.8]}><cylinderGeometry args={[0.01, 0.008, 0.15, 4]} /><meshStandardMaterial color="#795548" /></mesh>
+      </group>
+      <group position={[0.55, 0.35, 0]} rotation={[0, 0, -0.35]}>
+        <mesh><cylinderGeometry args={[0.12, 0.1, 0.5, 6]} /><meshStandardMaterial color="#424242" flatShading /></mesh>
+        <mesh position={[0, -0.35, 0]}><dodecahedronGeometry args={[0.13, 0]} /><meshStandardMaterial color="#263238" flatShading /></mesh>
+        <mesh position={[-0.08, -0.15, 0]} rotation={[0, 0, 0.8]}><cylinderGeometry args={[0.01, 0.008, 0.15, 4]} /><meshStandardMaterial color="#795548" /></mesh>
+      </group>
+
+      {/* ── Dead wood spine ── */}
+      {[0.5, 0.35, 0.2].map((y, i) => (
+        <mesh key={i} position={[0, y, -0.25]} rotation={[-0.3, 0, (i - 1) * 0.1]}>
+          <coneGeometry args={[0.03, 0.15, 5]} />
+          <meshStandardMaterial color="#3E2723" flatShading />
+        </mesh>
+      ))}
+
+      {/* ── Legs ── */}
+      <mesh position={[-0.2, -0.2, 0]}><cylinderGeometry args={[0.13, 0.16, 0.5, 6]} /><meshStandardMaterial color="#212121" flatShading /></mesh>
+      <mesh position={[0.2, -0.2, 0]}><cylinderGeometry args={[0.13, 0.16, 0.5, 6]} /><meshStandardMaterial color="#212121" flatShading /></mesh>
+
+      {/* ── Multi-element aura rings ── */}
+      <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.6, 0.015, 8, 24]} />
+        <meshStandardMaterial color="#FF1744" emissive="#D50000" emissiveIntensity={1} transparent opacity={0.25} />
+      </mesh>
+      <mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, Math.PI / 6]}>
+        <torusGeometry args={[0.55, 0.012, 8, 24]} />
+        <meshStandardMaterial color="#76FF03" emissive="#64DD17" emissiveIntensity={1} transparent opacity={0.2} />
+      </mesh>
+
+      <pointLight color="#7B1FA2" intensity={1.5} distance={4} />
+      <pointLight color="#FF6D00" intensity={0.5} distance={2} position={[0, 0.3, 0.3]} />
     </group>
   )
 }
 
 /* ═══════════════════════════════════════════════
-   LOOKUP — Maps guardian/general name → model
+   LOOKUP — Maps general name → model
    ═══════════════════════════════════════════════ */
-export function GuardianModelLookup({ name, ...props }: ModelProps & { name: string }) {
-  switch (name) {
-    case 'luntian':  return <LuntianModel {...props} />
-    case 'alon':     return <AlonModel {...props} />
-    case 'bulkan':   return <BulkanModel {...props} />
-    case 'haribon':  return <HaribonModel {...props} />
-    case 'pawikan':  return <PawikanModel {...props} />
-    default:         return <LuntianModel {...props} />
-  }
-}
-
 export function GeneralModelLookup({ name, ...props }: ModelProps & { name: string }) {
   switch (name) {
     case 'usok':     return <UsokModel {...props} />
     case 'mantsa':   return <MantsaModel {...props} />
-    default:         return <GenericGeneralModel {...props} />
+    case 'hukay':    return <HukayModel {...props} />
+    case 'putol':    return <PutolModel {...props} />
+    case 'lason':    return <LasonModel {...props} />
+    case 'ang_dumi': return <AngDumiModel {...props} />
+    default:         return <UsokModel {...props} />
   }
 }
