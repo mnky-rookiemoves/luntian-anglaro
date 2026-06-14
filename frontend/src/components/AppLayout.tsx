@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { path: '/map', icon: '🗺️', label: 'World Map', labelFil: 'Mapa ng Mundo' },
   { path: '/guardians', icon: '🛡️', label: 'Guardians', labelFil: 'Mga Tagapag-alaga' },
   { path: '/generals', icon: '💀', label: 'Generals', labelFil: 'Mga Heneral' },
+  { path: '/story', icon: '📖', label: 'Story', labelFil: 'Kwento' },
   { path: '/battle', icon: '⚔️', label: 'Battle', labelFil: 'Laban' },
   { path: '/regions', icon: '📍', label: 'Regions', labelFil: 'Mga Rehiyon' },
   { path: '/achievements', icon: '🏆', label: 'Achievements', labelFil: 'Mga Tagumpay' },

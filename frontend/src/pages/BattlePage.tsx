@@ -1,31 +1,56 @@
 /**
  * ⚔️ LUNTIAN ANGLARO — Battle Page
- * Select a Guardian and General, then fight!
+ * Two modes:
+ * - Story Mode: locked matchup, auto-starts, returns to story
+ * - Free Battle: choose any guardian vs any general
  */
-
-import { useState, useEffect } from 'react';
-import { useGameStore } from '@/store';
-import { ELEMENT_CONFIG } from '@/types/game.types';
-/**import BattleEngine from '@/components/battle/BattleEngine';*/
-import type { Guardian, General } from '@/types/game.types';
-import { toast } from 'sonner';
-import Battle3DArena from '@/components/battle3d/Battle3DArena';
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useGameStore } from '@/store'
+import { ELEMENT_CONFIG } from '@/types/game.types'
+import type { Guardian, General } from '@/types/game.types'
+import { toast } from 'sonner'
+import Battle3DArena from '@/components/battle3d/Battle3DArena'
 
 const BattlePage = () => {
-  const { guardians, generals, initialize, isInitialized, language } = useGameStore();
-  const [selectedGuardian, setSelectedGuardian] = useState<Guardian | null>(null);
-  const [selectedGeneral, setSelectedGeneral] = useState<General | null>(null);
-  const [inBattle, setInBattle] = useState(false);
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { guardians, generals, initialize, isInitialized, language } = useGameStore()
+
+  const [selectedGuardian, setSelectedGuardian] = useState<Guardian | null>(null)
+  const [selectedGeneral, setSelectedGeneral] = useState<General | null>(null)
+  const [inBattle, setInBattle] = useState(false)
+
+  // Story mode params
+  const storyMode = searchParams.get('mode') === 'story'
+  const storyGuardian = searchParams.get('guardian')
+  const storyGeneral = searchParams.get('general')
+  const storyChapter = searchParams.get('chapter')
+  const storyScene = searchParams.get('scene')
 
   useEffect(() => {
-    if (!isInitialized) initialize();
-  }, [initialize, isInitialized]);
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
 
+  // Story Mode: Auto-select and start battle immediately
+  useEffect(() => {
+    if (storyMode && storyGuardian && storyGeneral && guardians.length > 0 && generals.length > 0 && !inBattle) {
+      const g = guardians.find((g) => g.name === storyGuardian)
+      const gen = generals.find((g) => g.name === storyGeneral)
+      if (g && gen) {
+        setSelectedGuardian(g)
+        setSelectedGeneral(gen)
+        setInBattle(true)
+      }
+    }
+  }, [storyMode, storyGuardian, storyGeneral, guardians, generals])
+
+  // Start free battle
   const startBattle = () => {
     if (selectedGuardian && selectedGeneral) {
-      setInBattle(true);
+      setInBattle(true)
     }
-  };
+  }
 
   const handleBattleEnd = (won: boolean) => {
     if (won) {
@@ -34,27 +59,40 @@ const BattlePage = () => {
           ? `🏆 Victory! ${selectedGeneral?.display_name} has been defeated!`
           : `🏆 Tagumpay! Natalo si ${selectedGeneral?.display_name}!`,
         { duration: 5000 }
-      );
+      )
     } else {
       toast.error(
         language === 'en'
           ? `💀 Defeated by ${selectedGeneral?.display_name}. Try again!`
           : `💀 Natalo ni ${selectedGeneral?.display_name}. Subukan muli!`,
         { duration: 5000 }
-      );
+      )
     }
-  };
+  }
 
   const exitBattle = () => {
-    setInBattle(false);
-    setSelectedGuardian(null);
-    setSelectedGeneral(null);
-  };
+    if (storyMode && storyChapter) {
+      // Return to story and advance past the battle scene
+      const nextScene = storyScene ? Number(storyScene) + 1 : 0
+      navigate(`/story/${storyChapter}?resume=${nextScene}`)
+    } else {
+      setInBattle(false)
+      setSelectedGuardian(null)
+      setSelectedGeneral(null)
+    }
+  }
 
-  // ── 3D Battle Mode ──
+  // ── Battle Mode ──
   if (inBattle && selectedGuardian && selectedGeneral) {
     return (
       <div className="p-6">
+        {storyMode && (
+          <div className="text-center mb-3">
+            <span className="text-xs px-3 py-1 rounded-full bg-[var(--luntian-primary)]/15 text-[var(--luntian-primary)] border border-[var(--luntian-primary)]/30">
+              📖 {language === 'en' ? 'Story Battle' : 'Laban sa Kwento'}
+            </span>
+          </div>
+        )}
         <Battle3DArena
           guardian={selectedGuardian}
           general={selectedGeneral}
@@ -63,117 +101,118 @@ const BattlePage = () => {
           onExit={exitBattle}
         />
       </div>
-    );
+    )
   }
 
-  // Selection mode
+  // ── Selection Screen (Free Battle Only) ──
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-red-400 mb-2">
-        ⚔️ {language === 'en' ? 'Battle Simulator' : 'Simulator ng Laban'}
+      <h1 className="text-3xl font-bold text-[var(--luntian-primary)] mb-2">
+        ⚔️ {language === 'en' ? 'Battle Simulator' : 'Simulador ng Laban'}
       </h1>
       <p className="text-[var(--luntian-text-muted)] mb-8">
-        {language === 'en'
-          ? 'Choose your Guardian and face a General in combat!'
-          : 'Pumili ng iyong Tagapag-alaga at harapin ang isang Heneral sa laban!'}
+        {language === 'en' ? 'Choose your Guardian and face a General in combat!' : 'Pumili ng iyong Tagapag-alaga at harapin ang isang Heneral sa laban!'}
       </p>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Guardian Selection */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* ── Select Guardian ── */}
         <div>
-          <h2 className="text-lg font-semibold text-[var(--luntian-primary-light)] mb-4">
+          <h2 className="text-lg font-semibold text-[var(--luntian-primary)] mb-4">
             🛡️ {language === 'en' ? 'Select Guardian' : 'Pumili ng Tagapag-alaga'}
           </h2>
           <div className="space-y-3">
             {(Array.isArray(guardians) ? guardians : []).map((g) => {
-              const c = ELEMENT_CONFIG[g.element];
-              const isSelected = selectedGuardian?.id === g.id;
+              const config = ELEMENT_CONFIG[g.element]
+              const isSelected = selectedGuardian?.id === g.id
               return (
-                <button
+                <div
                   key={g.id}
                   onClick={() => setSelectedGuardian(g)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
-                    isSelected ? 'scale-[1.02]' : 'hover:scale-[1.01]'
+                  className={`rounded-xl p-4 border cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                    isSelected ? 'ring-2' : ''
                   }`}
                   style={{
-                    backgroundColor: isSelected ? `${c.bgColor}33` : `${c.bgColor}11`,
-                    borderColor: isSelected ? c.color : `${c.color}33`,
-                    boxShadow: isSelected ? `0 0 15px ${c.color}22` : 'none',
+                    backgroundColor: isSelected ? `${config.color}15` : 'var(--luntian-surface)',
+                    borderColor: isSelected ? config.color : `${config.color}30`,
+                    ringColor: isSelected ? config.color : undefined,
                   }}
                 >
-                  <span className="text-3xl">{c.emoji}</span>
-                  <div className="flex-1">
-                    <div className="font-bold" style={{ color: c.color }}>{g.display_name}</div>
-                    <div className="text-xs text-[var(--luntian-text-muted)]">
-                      {g.element_display} • {g.combat_role_display}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{config.emoji}</span>
+                      <div>
+                        <div className="font-bold" style={{ color: config.color }}>{g.display_name}</div>
+                        <div className="text-xs text-[var(--luntian-text-muted)]">
+                          {g.element_display} • {g.combat_role_display}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right text-xs text-[var(--luntian-text-muted)]">
+                      <div>{g.power_1}</div>
+                      <div>{g.power_2}</div>
+                      <div>{g.power_3}</div>
                     </div>
                   </div>
-                  <div className="text-right text-xs text-[var(--luntian-text-muted)]">
-                    <div>{g.power_1}</div>
-                    <div>{g.power_2}</div>
-                    <div>{g.power_3}</div>
-                  </div>
-                </button>
-              );
+                </div>
+              )
             })}
           </div>
         </div>
 
-        {/* General Selection */}
+        {/* ── Select General ── */}
         <div>
           <h2 className="text-lg font-semibold text-red-400 mb-4">
             💀 {language === 'en' ? 'Select General' : 'Pumili ng Heneral'}
           </h2>
           <div className="space-y-3">
             {(Array.isArray(generals) ? generals : []).map((g) => {
-              const isSelected = selectedGeneral?.id === g.id;
-              const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element);
+              const isSelected = selectedGeneral?.id === g.id
               return (
-                <button
+                <div
                   key={g.id}
                   onClick={() => setSelectedGeneral(g)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
-                    isSelected
-                      ? 'border-red-500 bg-red-950/40 scale-[1.02]'
-                      : 'border-red-900/30 bg-red-950/15 hover:bg-red-950/25 hover:scale-[1.01]'
+                  className={`rounded-xl p-4 border cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                    isSelected ? 'ring-2 ring-red-500' : ''
                   }`}
                   style={{
-                    boxShadow: isSelected ? '0 0 15px #EF535022' : 'none',
+                    backgroundColor: isSelected ? '#EF535015' : 'var(--luntian-surface)',
+                    borderColor: isSelected ? '#EF5350' : '#EF535030',
                   }}
                 >
-                  <span className="text-3xl">💀</span>
-                  <div className="flex-1">
-                    <div className="font-bold text-red-400">{g.display_name}</div>
-                    <div className="text-xs text-red-300/60">{g.threat_display}</div>
-                  </div>
-                  <div className="text-right text-xs">
-                    <div className="text-[var(--luntian-text-muted)]">{g.battle_phases} phases</div>
-                    {weakGuardian && (
-                      <div className="text-green-400/60">
-                        ⚡ {weakGuardian.display_name}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">💀</span>
+                      <div>
+                        <div className="font-bold text-red-400">{g.display_name}</div>
+                        <div className="text-xs text-red-300/60">{g.threat_display}</div>
                       </div>
-                    )}
+                    </div>
+                    <div className="text-right text-xs text-[var(--luntian-text-muted)]">
+                      <div>{g.battle_phases} phases</div>
+                      {g.weakness_element && (
+                        <div className="text-green-400">⚡ {g.weakness_element}</div>
+                      )}
+                    </div>
                   </div>
-                </button>
-              );
+                </div>
+              )
             })}
           </div>
         </div>
       </div>
 
-      {/* Start Battle Button */}
+      {/* ── Fight Button ── */}
       <div className="mt-8 text-center">
         <button
           onClick={startBattle}
           disabled={!selectedGuardian || !selectedGeneral}
-          className="px-10 py-4 rounded-xl text-lg font-bold transition-all duration-300 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="px-12 py-4 rounded-xl text-white font-bold text-lg transition-all duration-300 hover:scale-105 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
           style={{
             background: selectedGuardian && selectedGeneral
-              ? 'linear-gradient(135deg, #2E7D32, #C62828)'
+              ? 'linear-gradient(135deg, var(--luntian-primary), #EF5350)'
               : '#333',
-            color: 'white',
             boxShadow: selectedGuardian && selectedGeneral
-              ? '0 0 30px rgba(198, 40, 40, 0.3)'
+              ? '0 0 30px rgba(76, 175, 80, 0.3), 0 0 30px rgba(239, 83, 80, 0.3)'
               : 'none',
           }}
         >
@@ -183,7 +222,7 @@ const BattlePage = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default BattlePage;
+export default BattlePage
