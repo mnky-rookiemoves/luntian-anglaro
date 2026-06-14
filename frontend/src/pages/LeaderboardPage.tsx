@@ -55,7 +55,7 @@ const LeaderboardPage = () => {
               </tr>
             </thead>
             <tbody>
-              {entries.map((e) => (
+              {(entries || []).map((e) => (
                 <tr key={e.id} className="border-t border-white/5 hover:bg-[var(--luntian-primary)]/5">
                   <td className="p-3 font-bold text-[var(--luntian-gold)]">#{e.rank}</td>
                   <td className="p-3">

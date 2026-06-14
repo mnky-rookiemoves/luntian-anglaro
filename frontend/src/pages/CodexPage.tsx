@@ -83,7 +83,7 @@ const CodexPage = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {entries.map((e) => (
+          {(entries || []).map((e) => (
             <div
               key={e.id}
               className="rounded-xl p-5 border border-[var(--luntian-primary)]/20 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/5 transition-all"

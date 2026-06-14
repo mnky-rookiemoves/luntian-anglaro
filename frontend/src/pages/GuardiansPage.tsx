@@ -6,10 +6,32 @@ import { ELEMENT_CONFIG } from '@/types/game.types';
 const GuardiansPage = () => {
   const { guardians, initialize, isInitialized, language } = useGameStore();
   const navigate = useNavigate();
+  if (!isInitialized || !guardians || !Array.isArray(guardians)) {
+  return (
+    <div className="p-6 text-center">
+      <div className="text-4xl mb-4 animate-pulse">🌿</div>
+      <p className="text-[var(--luntian-text-muted)]">Loading...</p>
+    </div>
+  )
+}
 
   useEffect(() => {
     if (!isInitialized) initialize();
   }, [initialize, isInitialized]);
+
+  useEffect(() => {
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
+
+  // Guard: wait for data to load
+  if (!generals || !Array.isArray(generals) || generals.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <div className="text-4xl mb-4 animate-pulse">🌿</div>
+        <p className="text-[var(--luntian-text-muted)]">Loading Generals...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="p-6">
@@ -23,7 +45,7 @@ const GuardiansPage = () => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {guardians.map((g) => {
+        {(guardians || []).map((g) => {
           const config = ELEMENT_CONFIG[g.element];
           return (
             <div

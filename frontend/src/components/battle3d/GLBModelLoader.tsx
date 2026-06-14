@@ -53,10 +53,21 @@ const MODEL_COLORS: Record<string, { primary: string; emissive: string; emissive
    ═══════════════════════════════════════════════ */
 export function isMobile(): boolean {
   if (typeof window === 'undefined') return false
-  return (
-    window.innerWidth < 768 ||
-    /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  )
+  // Check screen size OR user agent OR WebGL support
+  const smallScreen = window.innerWidth < 768
+  const mobileUA = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  
+  // Check WebGL support
+  let noWebGL = false
+  try {
+    const canvas = document.createElement('canvas')
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl')
+    if (!gl) noWebGL = true
+  } catch (e) {
+    noWebGL = true
+  }
+  
+  return smallScreen || mobileUA || noWebGL
 }
 
 /* ═══════════════════════════════════════════════

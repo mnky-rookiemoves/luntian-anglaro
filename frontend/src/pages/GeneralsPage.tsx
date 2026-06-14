@@ -19,10 +19,33 @@ const THREAT_CONFIG: Record<string, { emoji: string; color: string }> = {
 const GeneralsPage = () => {
   const { generals, guardians, initialize, isInitialized, language } = useGameStore()
   const navigate = useNavigate()
+  if (!isInitialized || !generals || !Array.isArray(generals)) {
+  return (
+    <div className="p-6 text-center">
+      <div className="text-4xl mb-4 animate-pulse">🌿</div>
+      <p className="text-[var(--luntian-text-muted)]">Loading...</p>
+    </div>
+  )
+}
 
   useEffect(() => {
     if (!isInitialized) initialize()
   }, [initialize, isInitialized])
+
+  useEffect(() => {
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
+
+  // Guard: wait for data to load
+  if (!generals || !Array.isArray(generals) || generals.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <div className="text-4xl mb-4 animate-pulse">🌿</div>
+        <p className="text-[var(--luntian-text-muted)]">Loading Generals...</p>
+      </div>
+    )
+  }
+
 
   return (
     <div className="p-6">
@@ -36,7 +59,7 @@ const GeneralsPage = () => {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {generals.map((g) => {
+        {(generals || []).map((g) => {
           const threat = THREAT_CONFIG[g.threat_type] || { emoji: '💀', color: '#EF5350' }
           const weakGuardian = guardians.find((gd) => gd.element === g.weakness_element)
 

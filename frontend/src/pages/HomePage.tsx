@@ -22,10 +22,15 @@ const HomePage = () => {
     language,
   } = useGameStore();
 
+
   // Initialize game data on mount
+// Force initialize on mount
   useEffect(() => {
-    initialize();
-  }, [initialize]);
+    if (!isInitialized) initialize()
+  }, [initialize, isInitialized])
+
+  // Don't block render if data takes too long
+  // The page will render with whatever data is available
 
   // Glow animation
   useEffect(() => {
@@ -115,7 +120,7 @@ const HomePage = () => {
             {health && (
               <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-green-900/30 border border-green-700 text-green-400 text-sm mb-8">
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                {health.game} v{health.version} — {health.status.toUpperCase()}
+                {health?.game || 'LUNTIAN ANGLARO'} v{health?.version || '0.1.0'} — {health?.status?.toUpperCase() || 'OFFLINE'}
               </div>
             )}
 
@@ -124,7 +129,7 @@ const HomePage = () => {
               🛡️ {language === 'en' ? 'THE GUARDIANS' : 'ANG MGA TAGAPAG-ALAGA'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-10">
-              {guardians.map((g) => {
+              {(guardians || []).map((g) => {
                 const config = ELEMENT_CONFIG[g.element];
                 return (
                   <div
@@ -155,7 +160,7 @@ const HomePage = () => {
               💀 {language === 'en' ? 'THE GENERALS OF POLLUTION' : 'ANG MGA HENERAL NG POLUSYON'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-10">
-              {generals.map((g) => (
+              {(generals || []).map((g) => (
                 <div
                   key={g.id}
                   className="rounded-xl p-3 border border-red-900/40 bg-red-950/20 hover:bg-red-950/40 transition-all duration-300 hover:scale-105 cursor-pointer"
@@ -178,7 +183,7 @@ const HomePage = () => {
               🗺️ {language === 'en' ? 'REGIONS' : 'MGA REHIYON'}
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-10">
-              {regions.map((r) => (
+              {(regions || []).map((r) => (
                 <div
                   key={r.id}
                   className="rounded-xl p-3 border border-[var(--luntian-primary)]/30 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/10 transition-all duration-300 hover:scale-105 cursor-pointer"
