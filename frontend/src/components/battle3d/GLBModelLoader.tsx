@@ -32,6 +32,23 @@ export const MODEL_REGISTRY: Record<string, {
 }
 
 /* ═══════════════════════════════════════════════
+   COLOR MAP — applies colors to untextured .glb models
+   ═══════════════════════════════════════════════ */
+const MODEL_COLORS: Record<string, { primary: string; emissive: string; emissiveIntensity: number }> = {
+  luntian:  { primary: '#4CAF50', emissive: '#2E7D32', emissiveIntensity: 0.3 },
+  alon:     { primary: '#42A5F5', emissive: '#1565C0', emissiveIntensity: 0.4 },
+  bulkan:   { primary: '#8D6E63', emissive: '#BF360C', emissiveIntensity: 0.3 },
+  haribon:  { primary: '#A1887F', emissive: '#4CAF50', emissiveIntensity: 0.2 },
+  pawikan:  { primary: '#5D7B6F', emissive: '#FFB300', emissiveIntensity: 0.2 },
+  usok:     { primary: '#37474F', emissive: '#FF1744', emissiveIntensity: 0.4 },
+  mantsa:   { primary: '#1A237E', emissive: '#7B1FA2', emissiveIntensity: 0.3 },
+  hukay:    { primary: '#424242', emissive: '#FF6D00', emissiveIntensity: 0.4 },
+  putol:    { primary: '#4E342E', emissive: '#FF8F00', emissiveIntensity: 0.3 },
+  lason:    { primary: '#1a2e1a', emissive: '#FFAB00', emissiveIntensity: 0.3 },
+  ang_dumi: { primary: '#1a1a2e', emissive: '#7B1FA2', emissiveIntensity: 0.5 },
+}
+
+/* ═══════════════════════════════════════════════
    HELPERS
    ═══════════════════════════════════════════════ */
 export function hasGLBModel(name: string): boolean {
@@ -60,20 +77,33 @@ export function GLBModel({ name, animPhase, hp, role, baseX }: GLBModelProps) {
   const flashRef = useRef(0)
   const prevPhase = useRef(animPhase)
 
-  const clonedScene = useMemo(() => {
+ const clonedScene = useMemo(() => {
     const clone = scene.clone(true)
+    const colors = MODEL_COLORS[name]
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         child.castShadow = true
         child.receiveShadow = true
         const mesh = child as THREE.Mesh
         if (mesh.material) {
-          mesh.material = (mesh.material as THREE.Material).clone()
+          const oldMat = mesh.material as THREE.MeshStandardMaterial
+          const newMat = oldMat.clone()
+
+          // If the model has no texture (gray), apply character colors
+          if (!oldMat.map && colors) {
+            newMat.color = new THREE.Color(colors.primary)
+            newMat.emissive = new THREE.Color(colors.emissive)
+            newMat.emissiveIntensity = colors.emissiveIntensity
+            newMat.metalness = 0.2
+            newMat.roughness = 0.7
+          }
+
+          mesh.material = newMat
         }
       }
     })
     return clone
-  }, [scene])
+  }, [scene, name])
 
   const { autoScale, centerOffset } = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene)
