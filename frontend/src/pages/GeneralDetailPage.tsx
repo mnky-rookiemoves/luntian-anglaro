@@ -194,229 +194,243 @@ export default function GeneralDetailPage() {
   const weakGuardian = guardians.find((g) => g.element === general.weakness_element)
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
-      {/* ── Back Button ── */}
-      <button
-        onClick={() => navigate('/generals')}
-        className="text-sm text-[var(--luntian-text-muted)] hover:text-red-400 transition-colors"
-      >
-        {isFil ? '← Bumalik sa mga Heneral' : '← Back to Generals'}
-      </button>
-
-      {/* ═══ 3D MODEL SHOWCASE — Center Stage ═══ */}
-      <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-red-900/30 bg-[#0a0505]">
-        <Canvas camera={{ position: [0, 2, 5], fov: 35 }} gl={{ antialias: true }}>
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.4} />
-            <directionalLight position={[3, 5, 2]} intensity={1} />
-            <pointLight position={[-2, 3, 2]} intensity={0.6} color={threatColor} />
-            <pointLight position={[2, 1, -2]} intensity={0.4} color={threatColor} />
-            <fog attach="fog" args={['#0a0505', 6, 18]} />
-
-            {/* Arena floor */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-              <circleGeometry args={[2.5, 48]} />
-              <meshStandardMaterial color="#0d0505" metalness={0.1} roughness={0.9} />
-            </mesh>
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]}>
-              <ringGeometry args={[2.3, 2.5, 48]} />
-              <meshStandardMaterial
-                color={threatColor}
-                emissive={threatColor}
-                emissiveIntensity={0.6}
-                transparent
-                opacity={0.4}
-              />
-            </mesh>
-
-            <GeneralModelLookup
-              name={general.name}
-              animPhase="idle"
-              hp={100}
-              role="general"
-              baseX={0}
-            />
-            <OrbitControls
-              enablePan={false}
-              autoRotate
-              autoRotateSpeed={1.2}
-              enableZoom={false}
-              minPolarAngle={Math.PI / 5}
-              maxPolarAngle={Math.PI / 2.2}
-            />
-          </Suspense>
-        </Canvas>
-
-        {/* Bottom gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--luntian-bg)] to-transparent pointer-events-none" />
-
-        {/* Drag hint */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] text-[var(--luntian-text-muted)]/40 pointer-events-none">
-          Drag to rotate - Auto-spinning 360
-        </div>
+    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden">
+      {/* ── Back Button (slim top bar) ── */}
+      <div className="px-6 py-3 flex-shrink-0">
+        <button
+          onClick={() => navigate('/generals')}
+          className="text-sm text-[var(--luntian-text-muted)] hover:text-red-400 transition-colors"
+        >
+          {isFil ? '← Bumalik sa mga Heneral' : '← Back to Generals'}
+        </button>
       </div>
 
-      {/* ═══ NAME & TITLE — Centered below model ═══ */}
-      <div className="text-center">
-        <div className="flex items-center justify-center gap-3 mb-1">
-          <span className="text-4xl">{general.emoji}</span>
-          <h1 className="text-4xl font-black" style={{ color: threatColor }}>
-            {general.display_name}
-          </h1>
-        </div>
-        <p className="text-sm mb-1" style={{ color: threatColor + 'aa' }}>
-          {general.threat_display}
-        </p>
-        <p className="text-lg font-semibold text-[var(--luntian-text-muted)] italic">
-          {lore ? (isFil ? lore.title_fil : lore.title_en) : ''}
-        </p>
-        <p className="text-xs text-[var(--luntian-text-muted)]/60 mt-1">
-          {lore ? (isFil ? lore.origin_fil : lore.origin_en) : ''}
-        </p>
+      {/* ═══ MAIN SPLIT LAYOUT ═══ */}
+      <div className="flex-1 flex overflow-hidden">
 
-        {/* Badges */}
-        <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-          {lore && (
-            <span
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-bold"
-              style={{
-                borderColor: threatColor + '40',
-                backgroundColor: threatColor + '15',
-                color: threatColor,
-              }}
-            >
-              THREAT LEVEL: {lore.threat_level}
-            </span>
-          )}
-          {general.name === 'ang_dumi' && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-900/20 border border-red-900/40 text-xs font-bold text-red-400">
-              FINAL BOSS
-            </span>
-          )}
-        </div>
-      </div>
+        {/* ── LEFT COLUMN: Details ── */}
+        <div className="w-1/2 overflow-y-auto px-6 pb-6 space-y-4">
 
-      {/* ═══ STATS GRID ═══ */}
-      <div className="grid grid-cols-4 gap-3">
-        <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
-          <div className="text-2xl font-black" style={{ color: threatColor }}>{general.battle_phases}</div>
-          <div className="text-[10px] text-[var(--luntian-text-muted)] mt-1">
-            {isFil ? 'Mga Phase ng Laban' : 'Battle Phases'}
-          </div>
-        </div>
-        <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
-          <div className="text-2xl font-black text-[var(--luntian-gold)]">Saga {general.saga}</div>
-          <div className="text-[10px] text-[var(--luntian-text-muted)] mt-1">Saga</div>
-        </div>
-        <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
-          <div className="text-2xl font-black text-[var(--luntian-text)]">Ch. {general.chapter_number}</div>
-          <div className="text-[10px] text-[var(--luntian-text-muted)] mt-1">Chapter</div>
-        </div>
-        <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
-          <div className="text-2xl">📍</div>
-          <div className="text-xs text-[var(--luntian-text-muted)] mt-1">{general.region_name || 'Unknown'}</div>
-        </div>
-      </div>
-
-      {/* ═══ WEAKNESS ═══ */}
-      {weakGuardian && (
-        <div className="rounded-xl p-4 bg-[var(--luntian-surface)] border border-green-900/20">
-          <h3 className="text-sm font-bold text-[var(--luntian-primary)] mb-2">
-            {isFil ? 'Kahinaan' : 'Weakness'}
-          </h3>
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{weakGuardian.emoji}</span>
-            <div>
-              <span className="font-bold" style={{ color: ELEMENT_CONFIG[weakGuardian.element].color }}>
-                {weakGuardian.display_name}
-              </span>
-              <span className="text-[var(--luntian-text-muted)] text-sm ml-2">
-                ({weakGuardian.element_display})
-              </span>
+          {/* Name & Title */}
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="text-3xl">{general.emoji}</span>
+              <h1 className="text-3xl font-black" style={{ color: threatColor }}>
+                {general.display_name}
+              </h1>
             </div>
+            <p className="text-sm" style={{ color: threatColor + 'aa' }}>
+              {general.threat_display}
+            </p>
+            <p className="text-base font-semibold text-[var(--luntian-text-muted)] italic mt-1">
+              {lore ? (isFil ? lore.title_fil : lore.title_en) : ''}
+            </p>
+            <p className="text-xs text-[var(--luntian-text-muted)]/60">
+              {lore ? (isFil ? lore.origin_fil : lore.origin_en) : ''}
+            </p>
+
+            {/* Badges */}
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              {lore && (
+                <span
+                  className="inline-flex items-center px-3 py-1 rounded-full border text-xs font-bold"
+                  style={{
+                    borderColor: threatColor + '40',
+                    backgroundColor: threatColor + '15',
+                    color: threatColor,
+                  }}
+                >
+                  THREAT LEVEL: {lore.threat_level}
+                </span>
+              )}
+              {general.name === 'ang_dumi' && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full bg-red-900/20 border border-red-900/40 text-xs font-bold text-red-400">
+                  FINAL BOSS
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-4 gap-2">
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
+              <div className="text-lg font-black" style={{ color: threatColor }}>{general.battle_phases}</div>
+              <div className="text-[9px] text-[var(--luntian-text-muted)]">
+                {isFil ? 'Phase' : 'Phases'}
+              </div>
+            </div>
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
+              <div className="text-lg font-black text-[var(--luntian-gold)]">Saga {general.saga}</div>
+              <div className="text-[9px] text-[var(--luntian-text-muted)]">Saga</div>
+            </div>
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
+              <div className="text-lg font-black text-[var(--luntian-text)]">Ch. {general.chapter_number}</div>
+              <div className="text-[9px] text-[var(--luntian-text-muted)]">Chapter</div>
+            </div>
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15 text-center">
+              <div className="text-sm">📍</div>
+              <div className="text-[9px] text-[var(--luntian-text-muted)]">{general.region_name || 'Unknown'}</div>
+            </div>
+          </div>
+
+          {/* Weakness */}
+          {weakGuardian && (
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-green-900/20">
+              <h3 className="text-xs font-bold text-[var(--luntian-primary)] mb-1.5">
+                {isFil ? 'Kahinaan' : 'Weakness'}
+              </h3>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{weakGuardian.emoji}</span>
+                <div>
+                  <span className="font-bold text-sm" style={{ color: ELEMENT_CONFIG[weakGuardian.element].color }}>
+                    {weakGuardian.display_name}
+                  </span>
+                  <span className="text-[var(--luntian-text-muted)] text-xs ml-1">
+                    ({weakGuardian.element_display})
+                  </span>
+                </div>
+                <button
+                  onClick={() => navigate(`/guardians/${weakGuardian.name}`)}
+                  className="ml-auto text-[10px] px-2 py-1 rounded border border-[var(--luntian-primary)]/30 text-[var(--luntian-primary)] hover:bg-[var(--luntian-primary)]/10 transition-colors"
+                >
+                  {isFil ? 'Tingnan' : 'View'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Powers */}
+          {lore && (
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15">
+              <h3 className="text-xs font-bold mb-2" style={{ color: threatColor }}>
+                {isFil ? 'Mga Kapangyarihan' : 'Powers'}
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {lore.powers.map((power, i) => (
+                  <span
+                    key={i}
+                    className="px-2.5 py-1 rounded text-[10px] font-semibold border"
+                    style={{
+                      borderColor: threatColor + '40',
+                      backgroundColor: threatColor + '15',
+                      color: threatColor,
+                    }}
+                  >
+                    {power}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Battle Style */}
+          {lore && (
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15">
+              <h3 className="text-xs font-bold mb-1" style={{ color: threatColor }}>
+                {isFil ? 'Estilo ng Laban' : 'Battle Style'}
+              </h3>
+              <p className="text-xs text-[var(--luntian-text-muted)] leading-relaxed">
+                {isFil ? lore.battle_style_fil : lore.battle_style_en}
+              </p>
+            </div>
+          )}
+
+          {/* Corruption Effect */}
+          {lore && (
+            <div className="rounded-lg p-3 bg-red-950/20 border border-red-900/30">
+              <h3 className="text-xs font-bold text-red-400 mb-1">
+                {isFil ? 'Epekto ng Kabulukan' : 'Corruption Effect'}
+              </h3>
+              <p className="text-xs text-red-300/70 leading-relaxed">
+                {isFil ? lore.corruption_fil : lore.corruption_en}
+              </p>
+            </div>
+          )}
+
+          {/* Lore */}
+          {lore && (
+            <div className="rounded-lg p-3 bg-[var(--luntian-surface)] border border-red-900/15">
+              <h3 className="text-xs font-bold mb-2" style={{ color: threatColor }}>
+                {isFil ? 'Kasaysayan' : 'Lore'}
+              </h3>
+              <div className="space-y-2">
+                {(isFil ? lore.lore_fil : lore.lore_en).map((paragraph, i) => (
+                  <p key={i} className="text-xs text-[var(--luntian-text-muted)] leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Battle Button */}
+          <div className="pt-1 pb-4">
             <button
-              onClick={() => navigate(`/guardians/${weakGuardian.name}`)}
-              className="ml-auto text-xs px-3 py-1 rounded-lg border border-[var(--luntian-primary)]/30 text-[var(--luntian-primary)] hover:bg-[var(--luntian-primary)]/10 transition-colors"
+              onClick={() => navigate('/battle')}
+              className="w-full py-3 rounded-xl font-bold text-white transition-all hover:scale-[1.02] active:scale-95"
+              style={{ backgroundColor: threatColor }}
             >
-              {isFil ? 'Tingnan' : 'View'}
+              {isFil ? `Labanan si ${general.display_name}` : `Battle ${general.display_name}`}
             </button>
           </div>
         </div>
-      )}
 
-      {/* ═══ LORE ═══ */}
-      {lore && (
-        <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
-          <h3 className="text-sm font-bold mb-3" style={{ color: threatColor }}>
-            {isFil ? 'Kasaysayan' : 'Lore'}
-          </h3>
-          <div className="space-y-3">
-            {(isFil ? lore.lore_fil : lore.lore_en).map((paragraph, i) => (
-              <p key={i} className="text-sm text-[var(--luntian-text-muted)] leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
+        {/* ── RIGHT COLUMN: 3D Model Portrait ── */}
+        <div className="w-1/2 relative border-l border-red-900/15">
+          <Canvas
+            camera={{ position: [0, 1, 3.5], fov: 40 }}
+            gl={{ antialias: true }}
+            style={{ background: '#050205' }}
+          >
+            <Suspense fallback={null}>
+              <ambientLight intensity={0.4} />
+              <directionalLight position={[3, 5, 2]} intensity={1.2} />
+              <pointLight position={[-2, 2, 3]} intensity={0.8} color={threatColor} />
+              <pointLight position={[2, 0, -2]} intensity={0.4} color={threatColor} />
+              <fog attach="fog" args={['#050205', 5, 14]} />
+
+              {/* Small arena floor */}
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
+                <circleGeometry args={[1.5, 48]} />
+                <meshStandardMaterial color="#0a0505" metalness={0.1} roughness={0.9} />
+              </mesh>
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.49, 0]}>
+                <ringGeometry args={[1.35, 1.5, 48]} />
+                <meshStandardMaterial
+                  color={threatColor}
+                  emissive={threatColor}
+                  emissiveIntensity={0.8}
+                  transparent
+                  opacity={0.5}
+                />
+              </mesh>
+
+              <GeneralModelLookup
+                name={general.name}
+                animPhase="idle"
+                hp={100}
+                role="general"
+                baseX={0}
+              />
+              <OrbitControls
+                enablePan={false}
+                autoRotate
+                autoRotateSpeed={1}
+                enableZoom={false}
+                minPolarAngle={Math.PI / 5}
+                maxPolarAngle={Math.PI / 2.3}
+              />
+            </Suspense>
+          </Canvas>
+
+          {/* Drag hint */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-[var(--luntian-text-muted)]/30 pointer-events-none">
+            Drag to rotate
           </div>
-        </div>
-      )}
 
-      {/* ═══ POWERS ═══ */}
-      {lore && (
-        <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
-          <h3 className="text-sm font-bold mb-3" style={{ color: threatColor }}>
-            {isFil ? 'Mga Kapangyarihan' : 'Powers'}
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {lore.powers.map((power, i) => (
-              <span
-                key={i}
-                className="px-3 py-1.5 rounded-lg text-xs font-semibold border"
-                style={{
-                  borderColor: threatColor + '40',
-                  backgroundColor: threatColor + '15',
-                  color: threatColor,
-                }}
-              >
-                {power}
-              </span>
-            ))}
-          </div>
+          {/* Side gradient blend */}
+          <div className="absolute top-0 left-0 bottom-0 w-8 bg-gradient-to-r from-[var(--luntian-bg)] to-transparent pointer-events-none" />
         </div>
-      )}
-
-      {/* ═══ BATTLE STYLE ═══ */}
-      {lore && (
-        <div className="rounded-xl p-5 bg-[var(--luntian-surface)] border border-red-900/15">
-          <h3 className="text-sm font-bold mb-2" style={{ color: threatColor }}>
-            {isFil ? 'Estilo ng Laban' : 'Battle Style'}
-          </h3>
-          <p className="text-sm text-[var(--luntian-text-muted)] leading-relaxed">
-            {isFil ? lore.battle_style_fil : lore.battle_style_en}
-          </p>
-        </div>
-      )}
-
-      {/* ═══ CORRUPTION EFFECT ═══ */}
-      {lore && (
-        <div className="rounded-xl p-5 bg-red-950/20 border border-red-900/30">
-          <h3 className="text-sm font-bold text-red-400 mb-2">
-            {isFil ? 'Epekto ng Kabulukan' : 'Corruption Effect'}
-          </h3>
-          <p className="text-sm text-red-300/70 leading-relaxed">
-            {isFil ? lore.corruption_fil : lore.corruption_en}
-          </p>
-        </div>
-      )}
-
-      {/* ═══ BATTLE BUTTON ═══ */}
-      <div className="text-center pt-2 pb-8">
-        <button
-          onClick={() => navigate('/battle')}
-          className="px-8 py-3 rounded-xl font-bold text-white transition-all hover:scale-105 active:scale-95"
-          style={{ backgroundColor: threatColor }}
-        >
-          {isFil ? `Labanan si ${general.display_name}` : `Battle ${general.display_name}`}
-        </button>
       </div>
     </div>
   )
