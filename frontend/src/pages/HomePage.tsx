@@ -91,10 +91,10 @@ const HomePage = () => {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <button className="px-8 py-3 bg-[var(--luntian-primary)] hover:bg-[var(--luntian-primary-light)] text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_var(--luntian-primary)]">
+          <button onClick={() => navigate('/battle')} className="px-8 py-3 bg-[var(--luntian-primary)] hover:bg-[var(--luntian-primary-light)] text-white font-semibold rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_var(--luntian-primary)]">
             ⚔️ {language === 'en' ? 'Play' : 'Maglaro'}
           </button>
-          <button className="px-8 py-3 border border-[var(--luntian-primary)] text-[var(--luntian-primary-light)] hover:bg-[var(--luntian-primary)]/10 font-semibold rounded-lg transition-all duration-300 hover:scale-105">
+          <button onClick={() => navigate('/story-mode')} className="px-8 py-3 border border-[var(--luntian-primary)] text-[var(--luntian-primary-light)] hover:bg-[var(--luntian-primary)]/10 font-semibold rounded-lg transition-all duration-300 hover:scale-105">
             📖 {language === 'en' ? 'The Story' : 'Ang Kwento'}
           </button>
         </div>
