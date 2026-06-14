@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { useGameStore } from '@/store';
 import { ELEMENT_CONFIG } from '@/types/game.types';
+import { useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
   const [glowIntensity, setGlowIntensity] = useState(0);
@@ -21,6 +22,7 @@ const HomePage = () => {
     achievements,
     language,
   } = useGameStore();
+  const navigate = useNavigate()
 
 
   // Initialize game data on mount
@@ -134,6 +136,7 @@ const HomePage = () => {
                 return (
                   <div
                     key={g.id}
+                    onClick={() => navigate(`/guardians/${g.id}`)}
                     className="rounded-xl p-4 border transition-all duration-300 hover:scale-105 cursor-pointer"
                     style={{
                       backgroundColor: `${config.bgColor}22`,
@@ -163,6 +166,7 @@ const HomePage = () => {
               {(Array.isArray(generals) ? generals : []).map((g) => (
                 <div
                   key={g.id}
+                  onClick={() => navigate(`/generals/${g.name}`)}
                   className="rounded-xl p-3 border border-red-900/40 bg-red-950/20 hover:bg-red-950/40 transition-all duration-300 hover:scale-105 cursor-pointer"
                 >
                   <div className="font-bold text-sm text-red-400">
@@ -186,6 +190,7 @@ const HomePage = () => {
               {(Array.isArray(regions) ? regions : []).map((r) => (
                 <div
                   key={r.id}
+                  onClick={() => navigate(`/regions`)}
                   className="rounded-xl p-3 border border-[var(--luntian-primary)]/30 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/10 transition-all duration-300 hover:scale-105 cursor-pointer"
                 >
                   <div className="font-bold text-sm text-[var(--luntian-primary-light)]">

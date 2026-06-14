@@ -1,8 +1,10 @@
 import { useEffect } from 'react';
 import { useGameStore } from '@/store';
+import { useNavigate } from 'react-router-dom'
 
 const RegionsPage = () => {
   const { regions, initialize, isInitialized, language } = useGameStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isInitialized) initialize();
@@ -23,6 +25,7 @@ const RegionsPage = () => {
         {(Array.isArray(regions) ? regions : []).map((r) => (
           <div
             key={r.id}
+            onClick={() => navigate(`/regions`)}
             className="rounded-2xl p-6 border border-[var(--luntian-primary)]/30 bg-[var(--luntian-surface)] hover:bg-[var(--luntian-primary)]/5 transition-all duration-300 hover:scale-[1.01] cursor-pointer"
           >
             <div className="flex justify-between items-start mb-3">
