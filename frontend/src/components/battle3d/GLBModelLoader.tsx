@@ -49,9 +49,22 @@ const MODEL_COLORS: Record<string, { primary: string; emissive: string; emissive
 }
 
 /* ═══════════════════════════════════════════════
+   MOBILE DETECTION — skip heavy .glb on phones
+   ═══════════════════════════════════════════════ */
+export function isMobile(): boolean {
+  if (typeof window === 'undefined') return false
+  return (
+    window.innerWidth < 768 ||
+    /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  )
+}
+
+/* ═══════════════════════════════════════════════
    HELPERS
    ═══════════════════════════════════════════════ */
 export function hasGLBModel(name: string): boolean {
+  // Don't load heavy .glb files on mobile devices
+  if (isMobile()) return false
   return MODEL_REGISTRY[name]?.available ?? false
 }
 
