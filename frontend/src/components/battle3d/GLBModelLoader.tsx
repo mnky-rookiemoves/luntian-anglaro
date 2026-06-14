@@ -23,18 +23,18 @@ export const MODEL_REGISTRY: Record<string, {
   yOffset: number
 }> = {
   // Guardians
-  luntian:  { path: '/models/guardians/luntian.glb',  available: false, scale: 0.8, yOffset: 0 },
-  alon:     { path: '/models/guardians/alon.glb',     available: false, scale: 0.8, yOffset: 0 },
-  bulkan:   { path: '/models/guardians/bulkan.glb',   available: false, scale: 0.8, yOffset: 0 },
-  haribon:  { path: '/models/guardians/haribon.glb',  available: false, scale: 0.8, yOffset: 0 },
-  pawikan:  { path: '/models/guardians/pawikan.glb',  available: false, scale: 0.8, yOffset: 0 },
+  luntian:  { path: '/models/guardians/luntian.glb',  available: true, scale: 0.8, yOffset: 0 },
+  alon:     { path: '/models/guardians/alon.glb',     available: true, scale: 0.8, yOffset: 0 },
+  bulkan:   { path: '/models/guardians/bulkan.glb',   available: true, scale: 0.8, yOffset: 0 },
+  haribon:  { path: '/models/guardians/haribon.glb',  available: true, scale: 0.8, yOffset: 0 },
+  pawikan:  { path: '/models/guardians/pawikan.glb',  available: true, scale: 0.8, yOffset: 0 },
   // Generals
-  usok:     { path: '/models/generals/usok.glb',      available: false, scale: 0.8, yOffset: 0 },
-  mantsa:   { path: '/models/generals/mantsa.glb',    available: false, scale: 0.8, yOffset: 0 },
-  hukay:    { path: '/models/generals/hukay.glb',     available: false, scale: 0.8, yOffset: 0 },
-  putol:    { path: '/models/generals/putol.glb',     available: false, scale: 0.8, yOffset: 0 },
-  lason:    { path: '/models/generals/lason.glb',     available: false, scale: 0.8, yOffset: 0 },
-  ang_dumi: { path: '/models/generals/ang_dumi.glb',  available: false, scale: 1.0, yOffset: 0 },
+  usok:     { path: '/models/generals/usok.glb',      available: true, scale: 0.8, yOffset: 0 },
+  mantsa:   { path: '/models/generals/mantsa.glb',    available: true, scale: 0.8, yOffset: 0 },
+  hukay:    { path: '/models/generals/hukay.glb',     available: true, scale: 0.8, yOffset: 0 },
+  putol:    { path: '/models/generals/putol.glb',     available: true, scale: 0.8, yOffset: 0 },
+  lason:    { path: '/models/generals/lason.glb',     available: true, scale: 0.8, yOffset: 0 },
+  ang_dumi: { path: '/models/generals/ang_dumi.glb',  available: true, scale: 1.0, yOffset: 0 },
 }
 
 /* ═══════════════════════════════════════════════
